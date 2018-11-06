@@ -15,6 +15,8 @@ Main
 
 .. doxygenfile:: macsio_main.h
 
+.. doxygenfile:: macsio_main.c
+
 Logging
 =======
 
