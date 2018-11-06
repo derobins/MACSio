@@ -15,6 +15,14 @@ macsio_main.h
 
 .. doxygenfile:: macsio_main.h
 
+.. doxygenfile:: macsio_log.h
+
+.. doxygenfile:: macsio_timing.h
+
+.. doxygenfile:: macsio_data.h
+
+.. doxygenfile:: macsio_clargs.h
+
 .. doxygendefine:: MACSIO_LOG_DEFAULT_LINE_COUNT
 
 Indices and tables
