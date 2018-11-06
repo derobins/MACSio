@@ -29,7 +29,8 @@ Data
 ====
 
 .. doxygengroup:: MACSIO_DATA
-.. doxygengroup:: Randomization
+
+.. doxygengroup:: PRNGS
 
 Multiple Independent File (MIF) Parallel I/O Utilities
 ======================================================

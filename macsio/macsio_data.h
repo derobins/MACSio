@@ -39,7 +39,7 @@ extern "C" {
 
 /*!
 
-\defgroup PRNGs Randomization
+\defgroup PRNGS PRNGS
 \brief Randomization and Pseudo Random Number Generators
 
 @{
