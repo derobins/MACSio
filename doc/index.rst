@@ -10,6 +10,11 @@ Welcome to MACSio Documentation
    :maxdepth: 2
    :caption: Contents:
 
+macsio_main.h
+=============
+
+.. doxygenfile:: macsio_main.h
+
 Indices and tables
 ==================
 
