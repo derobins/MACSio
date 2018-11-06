@@ -18,10 +18,7 @@ Main
 Logging
 =======
 
-.. doxygenfile:: macsio_log.h
-
 .. doxygengroup:: MACSIO_LOG
-
 
 Timing
 ======
