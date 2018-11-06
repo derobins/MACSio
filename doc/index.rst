@@ -10,20 +10,30 @@ Welcome to MACSio Documentation
    :maxdepth: 2
    :caption: Contents:
 
-macsio_main.h
+Main
 =============
 
 .. doxygenfile:: macsio_main.h
 
+Logging
+=======
+
 .. doxygenfile:: macsio_log.h
+
+Timing
+======
 
 .. doxygenfile:: macsio_timing.h
 
+Data
+====
+
 .. doxygenfile:: macsio_data.h
 
-.. doxygenfile:: macsio_clargs.h
+Command Line
+============
 
-.. doxygendefine:: MACSIO_LOG_DEFAULT_LINE_COUNT
+.. doxygenfile:: macsio_clargs.h
 
 Indices and tables
 ==================
