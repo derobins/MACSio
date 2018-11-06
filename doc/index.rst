@@ -15,6 +15,9 @@ macsio_main.h
 
 .. doxygenfile:: macsio_main.h
 
+.. doxygendefine:: MACSIO_LOG_DEFAULT_LINE_COUNT
+   :project: c_file
+
 Indices and tables
 ==================
 
