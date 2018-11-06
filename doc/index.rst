@@ -45,6 +45,9 @@ Command Line
 
 .. doxygenfile:: macsio_clargs.h
 
+.. raw:: html
+   :file: macsio_design_intro_final_html/macsio_design_intro_final.htm
+
 Indices and tables
 ==================
 
