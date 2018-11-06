@@ -25,12 +25,17 @@ Logging
 Timing
 ======
 
-.. doxygenfile:: macsio_timing.h
+.. doxygengroup:: MACSIO_TIMING
 
 Data
 ====
 
-.. doxygenfile:: macsio_data.h
+.. doxygengroup:: MACSIO_DATA
+
+Multiple Independent File (MIF) Parallel I/O Utilities
+======================================================
+
+.. doxygengroup:: MACSIO_MIF
 
 Command Line
 ============
