@@ -27,6 +27,8 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
   from subprocess import call 
   call(['doxygen', 'macsio.doxygen.rtd'])
+  call(['pip', 'install', 'breathe'])
+
 
 # -- General configuration ------------------------------------------------
 
@@ -44,8 +46,8 @@ extensions = [
 ]
 
 # Breathe extension variables
-breathe_projects = { "ReadTheDocs-Breathe": "doxyxml/" }
-breathe_default_project = "ReadTheDocs-Breathe"
+breathe_projects = { "MACSio": "doxyxml/" }
+breathe_default_project = "MACSio"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
