@@ -42,6 +42,8 @@ extern "C" {
 \defgroup PRNGs Randomization
 \brief Randomization and Pseudo Random Number Generators
 
+@{
+
 MACSio creates and initializes several pseudo random number generators (PRNGs),
 all of which utilize the C standard library
 <a href="http://man7.org/linux/man-pages/man3/random.3.html">random()</a>
@@ -75,7 +77,6 @@ The PRNGs MACSio creates are...
 If these PRNGs are not sufficient, developers are free to create other PRNGs for
 other specific purposes.
 
-@{
 */
 
 /*!
@@ -120,6 +121,7 @@ extern void MACSIO_DATA_DestroyPRNG(
 /*!
 \def MD_random_naive
 \brief Get next random value from naive PRNG. Same as MD_random().
+
 The naive prng is fine for any randomization that does not need special behaviors.
 This is the one that is expected to be used most of the time.
 */
@@ -128,7 +130,8 @@ This is the one that is expected to be used most of the time.
 /*!
 \def MD_random_naive_tv
 \brief Get next random value from naive, time-variant PRNG
-naive_tv is like naive except that it is seeded based on current time and so
+
+The naive_tv PRNG is like naive except that it is seeded based on current time and so
 will change from run to run (e.g. is time-variant). It should be used in place
 of naive when randomization from run to run is desired.
 */
@@ -137,6 +140,7 @@ of naive when randomization from run to run is desired.
 /*!
 \def MD_random_naive_rv
 \brief Get next random value from naive, rank-variant PRNG
+
 Like naive but *guarantees* variation across ranks.
 */
 #define MD_random_naive_rv() MACSIO_DATA_GetValPRNG(2)
@@ -144,6 +148,7 @@ Like naive but *guarantees* variation across ranks.
 /*!
 \def MD_random_naive_rtv
 \brief Get next random value from naive, rank- and time-variant PRNG
+
 Like naive_rv but guarantees variation from run to run.
 */
 #define MD_random_naive_rtv() MACSIO_DATA_GetValPRNG(3)
@@ -151,16 +156,18 @@ Like naive_rv but guarantees variation from run to run.
 /*!
 \def MD_random_rankinv
 \brief Get next random value from rank-invariant PRNG
-rank_invariant is neither seeded based on rank nor shall be used in way that would
-cause inconsistency across ranks. Failing to call it collectively, will cause
-indeterminent behavior.
+
+The rank_invariant PRNG is neither seeded based on rank nor shall be used in way
+that would cause inconsistency across ranks. Failing to call it collectively, will
+cause indeterminent behavior.
 */
 #define MD_random_rankinv() MACSIO_DATA_GetValPRNG(4)
 
 /*!
 \def MD_random_rankinv_tv
 \brief Get next random value from rank-invariant but time-variant PRNG
-like rank_invariant except causes variation in randomization from run to run
+
+Like the rank_invariant PRNG except causes variation in randomization from run to run
 */
 #define MD_random_rankinv_tv() MACSIO_DATA_GetValPRNG(5)
 
