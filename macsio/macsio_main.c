@@ -160,7 +160,7 @@ static json_object *ProcessCommandLine(int argc, char *argv[], int *plugin_argi)
 ////#warning OPTION TO SET OUTPUT PRECISION TO FLOAT
 
     cl_result = MACSIO_CLARGS_ProcessCmdline((void**)&mainJargs, argFlags, 1, argc, argv,
-        "--units_prefix_system %s", "binary",
+        "--units_prefix_system %s", "\"binary\"",
             "Specify which SI units prefix system to use both in reporting performance\n"
             "data and in interpreting sizing modifiers to arguments. The options are\n"
             "\"binary\" and \"decimal\". For \"binary\" unit prefixes, sizes are reported\n"
@@ -303,8 +303,7 @@ static json_object *ProcessCommandLine(int argc, char *argv[], int *plugin_argi)
             "of 3 will almost certainly effect performance. For debug level 3,\n"
             "MACSio will generate ascii json files from each processor for the main\n"
             "dump object prior to starting dumps.",
-        MACSIO_CLARGS_ARG_GROUP_BEG(Log File Options),
-            "Options to control size and shape of log file",
+        MACSIO_CLARGS_ARG_GROUP_BEG(Log File Options, Options to control size and shape of log file),
         "--log_file_name %s", "macsio-log.log",
             "The name of the log file.",
         "--log_line_cnt %d %d", "64 0",

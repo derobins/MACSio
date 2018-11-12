@@ -28,6 +28,10 @@ Place, Suite 330, Boston, MA 02111-1307 USA
 #include <time.h>
 #include <unistd.h>
 
+#ifdef HAVE_MPI
+#include <mpi.h>
+#endif
+
 #include <macsio_log.h>
 #include <macsio_timing.h>
 
@@ -100,7 +104,10 @@ int main(int argc, char **argv)
     {
         if (!rank)
             fprintf(stderr, "This test only appropriate for 8 or fewer processors\n");
+#ifdef HAVE_MPI
         MPI_Abort(MPI_COMM_WORLD, 1);
+#endif
+        exit(1);
     }
 
     if (!rank)
@@ -144,6 +151,7 @@ int main(int argc, char **argv)
     }
     free(timer_strs);
 
+#ifdef HAVE_MPI
     MACSIO_TIMING_ReduceTimers(MPI_COMM_WORLD, 0);
     if (!rank)
     {
@@ -156,6 +164,7 @@ int main(int argc, char **argv)
         }
         free(timer_strs);
     }
+#endif
 
     MACSIO_LOG_LogFinalize(MACSIO_LOG_MainLog);
 

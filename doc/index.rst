@@ -10,46 +10,11 @@ Welcome to MACSio Documentation
    :maxdepth: 2
    :caption: Contents:
 
-Main
-====
-
-.. doxygengroup:: MACSIO_MAIN
-
-Logging
-=======
-
-.. doxygengroup:: MACSIO_LOG
-
-Timing
-======
-
-.. doxygengroup:: MACSIO_TIMING
-
-Data
-====
-
-.. doxygengroup:: MACSIO_DATA
-
-Randomization
--------------
-
-.. doxygengroup:: PRNGS
-
-Multiple Independent File (MIF) Parallel I/O Utilities
-======================================================
-
-.. doxygengroup:: MACSIO_MIF
-
-Command Line
-============
-
-.. doxygenfile:: macsio_clargs.h
-
-.. raw:: html
-   :file: macsio_design_intro_final_html/macsio_design_intro_final.htm
-
-Indices and tables
-==================
+   macsio_timing
+   macsio_log
+   macsio_mif
+   macsio_clargs
+   contributing
 
 * :ref:`genindex`
 * :ref:`modindex`

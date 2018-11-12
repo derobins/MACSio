@@ -88,9 +88,9 @@ static void *OpenPDBFile(const char *fname, const char *nsname,
     return (void *) retval;
 }
 
-static void ClosePDBFile(void *file, void *userData)
+static int ClosePDBFile(void *file, void *userData)
 {
-    PD_close((PDBfile*)file);
+    return PD_close((PDBfile*)file);
 }
 
 static void write_mesh_part(PDBfile *pdbfile, json_object *part_obj)

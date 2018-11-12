@@ -118,59 +118,14 @@ add_param_to_json_retobj(json_object *retobj, char const *key, json_object *addo
     }
 }
 
-/*---------------------------------------------------------------------------------------------------------------------------------
- * Audience:	Private
- * Chapter:	Example and Test Utilities	
- * Purpose:	Parse and assign command-line arguments	
- *
- * Description:	This routine is designed to do parsing of simple command-line arguments and assign values associated with
- *		them to caller-supplied scalar variables. It is used in the following manner.
- *
- *		   MACSIO_ProccessCommandLine(argc, argv,
- *		      "-multifile",
- *		         "if specified, use a file-per-timestep",
- *		         &doMultifile,
- *		      "-numCycles %d",
- *		         "specify the number of cycles to run",
- *		         &numCycles,
- *		      "-dims %d %f %d %f",
- *		         "specify size (logical and geometric) of mesh",
- *		         &Ni, &Xi, &Nj, &Xj
- *		      MACSIO_CLARGS_END_OF_ARGS);
- *
- *		After the argc,argv arguments, the remaining arguments come in groups of 3. The first of the three is a
- *		argument format specifier much like a printf statement. It indicates the type of each parameter to the
- *		argument and the number of parameters. Presently, it understands only %d, %f and %s types. the second
- *		of the three is a help line for the argument. Note, you can make this string as long as the C-compiler
- *		will permit. You *need*not* embed any '\n' charcters as the print routine will do that for you.
- *
- *		Command line arguments for which only existence of the argument is tested assume a caller-supplied return
- *		value of int and will be assigned `1' if the argument exists and `0' otherwise.
- *
- *		Do not name any argument with a substring `help' as that is reserved for obtaining help. Also, do not
- *		name any argument with the string `end_of_args' as that is used to indicate the end of the list of
- *		arguments passed to the function.
- *
- *		If any argument on the command line has the substring `help', help will be printed by processor 0 and then
- *		this function calls MPI_Finalize() (in parallel) and exit().
- *
- * Parallel:    This function must be called collectively in MPI_COMM_WORLD. Parallel and serial behavior is identical except in
- *		the
- *
- * Return:	MACSIO_CLARGS_OK, MACSIO_CLARGS_ERROR or MACSIO_CLARGS_HELP
- *
- * Programmer:	Mark Miller, LLNL, Thu Dec 19, 2001 
- *---------------------------------------------------------------------------------------------------------------------------------
- */
 int
 MACSIO_CLARGS_ProcessCmdline(
-   void **retobj,       /* returned object (for cases that need it) */
-   MACSIO_CLARGS_ArgvFlags_t flags, /* flag to indicate what to do if encounter an unknown argument (FATAL|WARN) */
-   int argi,            /* first arg index to start processing at */
-   int argc,		/* argc from main */
-   char **argv,		/* argv from main */
-   ...			/* a comma-separated list of 1) argument name and format specifier,  2) help-line for argument,
-			   3) caller-supplied scalar variables to set */
+   void **retobj,
+   MACSIO_CLARGS_ArgvFlags_t flags,
+   int argi,
+   int argc,
+   char **argv,
+   ...
 )
 {
    char *argvStr = NULL;

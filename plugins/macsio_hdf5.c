@@ -601,7 +601,11 @@ typedef struct _user_data {
 static void *CreateHDF5File(const char *fname, const char *nsname, void *userData)
 {
     hid_t *retval = 0;
-    hid_t h5File = H5Fcreate(fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    hid_t h5File;
+    hid_t fapl = H5Pcreate(H5P_FILE_ACCESS);
+    H5Pset_fclose_degree(fapl, H5F_CLOSE_SEMI);
+    h5File = H5Fcreate(fname, H5F_ACC_TRUNC, H5P_DEFAULT, fapl);
+    H5Pclose(fapl);
     if (h5File >= 0)
     {
 //#warning USE NEWER GROUP CREATION SETTINGS OF HDF5
@@ -620,7 +624,11 @@ static void *OpenHDF5File(const char *fname, const char *nsname,
                    MACSIO_MIF_ioFlags_t ioFlags, void *userData)
 {
     hid_t *retval;
-    hid_t h5File = H5Fopen(fname, ioFlags.do_wr ? H5F_ACC_RDWR : H5F_ACC_RDONLY, H5P_DEFAULT);
+    hid_t h5File;
+    hid_t fapl = H5Pcreate(H5P_FILE_ACCESS);
+    H5Pset_fclose_degree(fapl, H5F_CLOSE_SEMI);
+    h5File = H5Fopen(fname, ioFlags.do_wr ? H5F_ACC_RDWR : H5F_ACC_RDONLY, fapl);
+    H5Pclose(fapl);
     if (h5File >= 0)
     {
         if (ioFlags.do_wr && nsname && userData)
@@ -634,15 +642,26 @@ static void *OpenHDF5File(const char *fname, const char *nsname,
     return (void *) retval;
 }
 
-static void CloseHDF5File(void *file, void *userData)
+static int CloseHDF5File(void *file, void *userData)
 {
+    const unsigned int obj_flags = H5F_OBJ_LOCAL | H5F_OBJ_DATASET |
+        H5F_OBJ_GROUP | H5F_OBJ_DATATYPE | H5F_OBJ_ATTR;
+    int noo;
+    herr_t close_retval;
+
     if (userData)
     {
         user_data_t *ud = (user_data_t *) userData;
         H5Gclose(ud->groupId);
     }
-    H5Fclose(*((hid_t*) file));
+
+    /* Check for any open objects in this file */
+    int noo = H5Fget_obj_count(fid, obj_flags);
+    close_retval = H5Fclose(*((hid_t*) file));
     free(file);
+
+    if (noo > 0) return -1;
+    return (int) close_retval;
 }
 
 static void write_mesh_part(hid_t h5loc, json_object *part_obj)

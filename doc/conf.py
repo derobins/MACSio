@@ -23,11 +23,10 @@ import os
 
 # hack for readthedocs to cause it to run doxygen first
 # https://github.com/rtfd/readthedocs.org/issues/388
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if on_rtd:
+if os.environ.get('READTHEDOCS'):
   from subprocess import call 
   call(['doxygen', 'macsio.doxygen.rtd'])
-  call(['pip', 'install', 'breathe'])
+#  call(['pip', 'install', 'breathe'])
 
 
 # -- General configuration ------------------------------------------------
@@ -48,6 +47,7 @@ extensions = [
 # Breathe extension variables
 breathe_projects = { "MACSio": "doxyxml/" }
 breathe_default_project = "MACSio"
+breathe_default_members = ('members', 'undoc-members')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -275,3 +275,8 @@ latex_elements = {
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+rst_epilog = """
+.. _MACSio: https://computation.llnl.gov/projects/co-design/macsio 
+.. _MIF: https://www.hdfgroup.org/2017/03/mif-parallel-io-with-hdf5
+"""
