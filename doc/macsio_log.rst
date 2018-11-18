@@ -50,13 +50,16 @@ to the log. There is no parallel communication involved in issuing messages to l
 
 Examples of the use of the logging package can be found in :ref:`tstlog_c`.
 
+Logging API
+^^^^^^^^^^^
+
 .. doxygengroup:: MACSIO_LOG
 
 
 .. _tstlog_c:
 
-Example
-^^^^^^^
+Example (tstlog.c)
+^^^^^^^^^^^^^^^^^^
 
 .. include:: ../macsio/tstlog.c
    :code: c

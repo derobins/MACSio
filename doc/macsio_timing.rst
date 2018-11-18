@@ -56,15 +56,17 @@ By default, the timing package uses `MPI_Wtime()
 
 Examples of the use of the logging package can be found in :ref:`tsttiming_c`.
 
+Timing API
+^^^^^^^^^^
+
 .. doxygengroup:: MACSIO_TIMING
 
 .. _tsttiming_c:
 
-Example
-^^^^^^^
+Example (tsttiming.c)
+^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: ../macsio/tsttiming.c
    :code: c
    :start-line: 27
    :number-lines:
-

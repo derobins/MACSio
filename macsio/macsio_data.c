@@ -37,7 +37,7 @@ Place, Suite 330, Boston, MA 02111-1307 USA
 #include <sys/time.h>
 #include <time.h>
 
-#define MACSIO_DATA_MAX_PRNGS 10
+#define MACSIO_DATA_MAX_PRNGS 20
 
 /*!
 \brief Support functions for Perlin noise

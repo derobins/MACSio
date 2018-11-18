@@ -10,10 +10,13 @@ Welcome to MACSio Documentation
    :maxdepth: 2
    :caption: Contents:
 
+   macsio_main
+   macsio_data
+   Plugins <macsio_iface>
+   MIF Parallel <macsio_mif>
+   Arg Parsing <macsio_clargs>
    macsio_timing
    macsio_log
-   macsio_mif
-   macsio_clargs
    contributing
 
 * :ref:`genindex`

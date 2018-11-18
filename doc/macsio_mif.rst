@@ -119,10 +119,17 @@ These MIF_ utilities are designed to support use in conjunction with the
 <https://scr.readthedocs.io/en/latest/index.html>`_ library.
 However, use of SCR may place additional restrictions on the tasks-to-files
 mapping depending, partially, on whether SCR is configured to write to
-node-local storage.
+node-local storage. For example, SCR is typically supported only in
+file-per-processor mappings.
+
+MIF_ API
+^^^^^^^^
+
+.. doxygenstruct:: _MACSIO_MIF_ioFlags_t
 
 .. doxygengroup:: MACSIO_MIF
 
 .. only:: internals
 
     .. doxygenstruct:: _MACSIO_MIF_baton_t
+

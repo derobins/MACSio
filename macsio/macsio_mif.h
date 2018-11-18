@@ -99,7 +99,7 @@ MACSIO_MIF_Init(
                                          application is executing on and the filesystem. Pass MACSIO_MIF_MAX for
                                          file-per-processor. Pass MACSIO_MIF_AUTO (currently not supported) to
                                          request that MACSIO_MIF determine and use an optimum file count. */
-    MACSIO_MIF_ioFlags_t ioFlags,   /**< [in] See MACSIO_MIF_ioFlags_t for meaning of flags. */
+    MACSIO_MIF_ioFlags_t ioFlags,   /**< [in] See \ref MACSIO_MIF_ioFlags_t for meaning of flags. */
 #ifdef HAVE_MPI
     MPI_Comm mpiComm,               /**< [in] The MPI communicator containing all the MPI ranks that will
                                          marshall data in the MIF I/O operation. */
@@ -127,7 +127,7 @@ extern void MACSIO_MIF_Finish(
 All tasks in \c mpiComm argument to \c MACSIO_MIF_Init() call this function
 collectively. For the first task in each group, this call returns immediately.
 For all others in the group, it blocks, waiting for the task \em before it to
-finish its work on the group's file and call \c MACSIO_MIF_HandOffBataon().
+finish its work on the group's file and call \c MACSIO_MIF_HandOffBaton().
 
 \returns A void pointer to whatever data instance the \c createCb or \c openCb
 methods return. The caller must cast this returned pointer to the correct type.

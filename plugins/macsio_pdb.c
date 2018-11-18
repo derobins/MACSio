@@ -45,6 +45,8 @@ Place, Suite 330, Boston, MA 02111-1307 USA
 
 #ifdef HAVE_SILO
 #include <lite_pdb.h> /* PDB Lite is part of Silo */
+#else
+#include <pdb.h>
 #endif
 
 /* Disable debugging messages */

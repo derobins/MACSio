@@ -43,6 +43,7 @@ extern "C" {
 #define MACSIO_MIF_MIFMAX -1
 #define MACSIO_MIF_MIFAUTO -2
 
+/*! \struct _MACSIO_MIF_baton_t */
 typedef struct _MACSIO_MIF_baton_t
 {
     MACSIO_MIF_ioFlags_t ioFlags; /**< Various flags controlling behavior. */

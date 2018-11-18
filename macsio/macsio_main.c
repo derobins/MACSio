@@ -676,7 +676,8 @@ static void FinalizePRNGs()
     MPI_Reduce(rand_check, rand_check_r, 2, MPI_UNSIGNED, MPI_BXOR, 0, MACSIO_MAIN_Comm);
     if (MACSIO_MAIN_Rank == 0 && (rand_check_r[0] != 0 || rand_check_r[1] != 0))
     {
-        MACSIO_LOG_MSG(Warn, ("rank-invariant PRNGs failed sanity check"));
+        MACSIO_LOG_MSG(Warn, ("rank-invariant PRNGs failed sanity check "
+            "suggesting non-collective use."));
     }
 #endif
 

@@ -40,9 +40,12 @@ typedef enum _TestPasses_t {
     }
 #define CHECK_VAL(WHEN, CONDITION) CHECK_VAL_(WHEN, CONDITION, __LINE__)
 
+/* The funky macro magic here is so that the same MACSIO_CLARGS_ProcessCmdline
+   code block can be used in two different ways that change the argument list */
 #define VVV /*void*/
 #define COMMA ,
-#define PCL(JSON, MYBOOL, MYINT, MYDOUBLE, MYSTRING, MULTI1, MULTI2, DUMMYD, DUMMYF, ARGN, COMMA, TWO) \
+#define PCL(JSON, MYBOOL, MYINT, MYDOUBLE, MYSTRING, MULTI1, MULTI2,\
+    DUMMYD, DUMMYF, ARGN, COMMA, TWO) \
     MACSIO_CLARGS_ProcessCmdline(JSON, argFlags, argi, argc, argv, \
         "--bool-example", "", \
             "An example of a bool argument", \
