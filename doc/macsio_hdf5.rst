@@ -49,7 +49,7 @@ directory containining the `H5Z-ZFP`_ filter plugin library. For example,
 
 .. _HDF5 : https://www.hdfgroup.org/downloads/hdf5/
 
-.. _H5Z-ZFP : https://www.visitusers.org/index.php?title=Github
+.. _H5Z-ZFP : https://github.com/LLNL/H5Z-ZFP
 
 .. _Gzip : https://www.gnu.org/software/gzip/
 
