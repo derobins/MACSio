@@ -4,6 +4,14 @@ Main
 The design of MACSio_ is described in detail in
 :download:`an accompanying design document <macsio_design.pdf>`
 
+MACSio_ is divided into two halves. The main program is responsible for managing the generation of data,
+as well as other compute and/or communication workloads to be mixed with I/O workloads. A plugin does the
+work of marshalling data between memory and disk. A given plugin is intended to represent the *best* approach
+for handling the data for a given I/O library and parallel I/O paradigm. Any given performance test
+involves the use of just one of the available plugins. Eventually, to model high-level workloads, it is
+concievable MACSio_ could be extended to scriptify various of the workloads, including I/O with any given
+plugin, it manages.
+
 MACSio_'s command-line arguments are designed to give the user control over the nominal I/O request sizes
 emitted from MPI ranks for mesh bulk data and for amorphous metadata. The user specifies a size, in bytes,
 for mesh pieces. MACSio_ then computes a mesh part size, in nodes, necessary to hit this target byte count for
