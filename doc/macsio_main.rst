@@ -1,16 +1,39 @@
 Main
 ----
 
-The design of MACSio_ is described in detail in
-:download:`an accompanying design document <macsio_design.pdf>`
+The design of MACSio_ is described in more detail in
+:download:`an accompanying design document <macsio_design.pdf>`. Here, we provide only a high
+level overview.
 
-MACSio_ is divided into two halves. The main program is responsible for managing the generation of data,
-as well as other compute and/or communication workloads to be mixed with I/O workloads. A plugin does the
-work of marshalling data between memory and disk. A given plugin is intended to represent the *best* approach
-for handling the data for a given I/O library and parallel I/O paradigm. Any given performance test
-involves the use of just one of the available plugins. Eventually, to model high-level workloads, it is
-concievable MACSio_ could be extended to scriptify various of the workloads, including I/O with any given
-plugin, it manages.
+MACSio_ is divided into two halves; the MACSio main *driver* and the I/O *plugin(s)*.
+
+The main driver generates the scientific data objects (examples of which are pictured below)
+typical of HPC, multi-physcis simulation codes. It also orchestrates a number of activities such as
+compute and/or communication workloads to be mixed with the I/O workload, time and space
+performance data gathering, event logging and other support operations.
+
+.. figure:: scientific_data_objects.png
+   :width: 60%
+   :align: center
+
+   Scientific computing data objects typical of mesh-based multi-physics simulation codes
+
+The other half of MACSio_ is the I/O *plugin(s)*.
+A MACSio_ *plugin* orchestrates marshalling of data between memory and disk. Different plugins
+exist to implement different I/O *proxies*. For example, the Silo plugin serves as a proxy for
+many (not all)
+`LLNL simulation codes <https://wci.llnl.gov/simulation/computer-codes>`_. The Exodus plugin
+serves as proxy for many
+`Sandia simulation codes <https://www.sandia.gov/asc/integrated_codes.html>`_.
+On the other hand, instead of representing a proxy for any specific organization or code, the
+HDF5 plugin serves as a proxy for the *best* way to use HDF5 for various
+*parallel I/O paradigms*. It also provides a number of command-line options to control low-level
+features of the HDF5 library to help probe the impact of various options on the performance space.
+
+.. note:: Should extend MACSio_ to support scripted sequences of dumps
+
+MACSio_'s main driver accepts a slew of command-line arguments. If MACSio_ has been built, you can
+obtain help for MACSio_'s main driver arguments
 
 MACSio_'s command-line arguments are designed to give the user control over the nominal I/O request sizes
 emitted from MPI ranks for mesh bulk data and for amorphous metadata. The user specifies a size, in bytes,

@@ -26,7 +26,8 @@ import os
 if os.environ.get('READTHEDOCS'):
   from subprocess import call 
   call(['doxygen', 'macsio.doxygen.rtd'])
-  call(['pip', 'install', 'breathe'])
+  if not os.environ.get('BUILD_LOCAL'):
+    call(['pip', 'install', 'breathe'])
 
 
 # -- General configuration ------------------------------------------------

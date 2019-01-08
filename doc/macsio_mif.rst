@@ -1,5 +1,23 @@
+Parallel I/O Paradigms
+----------------------
+
+MACSio_ provides utility packages to support the development of plugins handling
+a variety of parallel I/O paradigms and variations thereof. These include
+
+* Multiple Independent File (MIF_) parallel I/O
+  * With and without `SCR`_
+  * With and without *naive* Two-Phase
+* Single, Shared File (SSF) parallel I/O
+* Hybrid MIF_/SSF where each MIF_ file is handled via SSF
+* Multi-Pass
+* Application managed/extra I/O nodes.
+
+To be clear, MACSio_ itself does NOT implement any of these parallel I/O paradigms.
+Rather, MACSio_ provides some utility packages that enable plugin developers to 
+implement various parallel I/O paradigms. These packages are described here.
+
 Multiple Independent File (MIF) Parallel I/O
---------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 MACSio_'s Multiple Independent File (MIF_) package is designed to support the development
 of plugins utilizing the MIF_ paradigm.
@@ -102,7 +120,7 @@ There are a large number of advantages to MIF-IO over SSF-IO.
 * Some Data-in-transit (DIT) services (e.g. those that may change size or shape such as
   compression) are easier to apply in a MIF_ setting because processors are freed from
   having to coordinate with each other on changes in data size/shape as it is moved to the file.
-* Good performance demands very little in the way of extra/advanced features from the underlying\n
+* Good performance demands very little in the way of extra/advanced features from the underlying
   I/O hardware and filesystem. A relatively dumb filesysem can get it right and perform well.
 * Application controlled throttling of I/O is easily supported in a MIF_ setting because the
   number of concurrent operations is explicitly controlled. This can help to avoid overloading the
@@ -112,14 +130,29 @@ There are a large number of advantages to MIF-IO over SSF-IO.
   filesystem as a collection of shards and different numbers of parallel tasks can process
   different numbers of shards.
 
-MACSio_'s MIF_ Package and SCR
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+MACSio_'s MIF_ Package and Naive Two-Phase I/O
+""""""""""""""""""""""""""""""""""""""""""""""
+
+.. warning:: FEATURE CURRENTLY IN DESIGN
+
+   An additional option available in MACSio_'s MIF_ package is support for a *naive* form of
+   two-phase I/O. In this mode, I/O requests from each parallel task are accumulated into
+   a local ram-disk or other form of node-local storage. This process proceeds in an
+   embarrasingly parallel way until either a threshold of storage is reached or the plugin
+   explicitly indicates a flush is desired. At this point, all parallel tasks block while
+   local data accumulated on each task is aggregted to aggregator tasks where the actual
+   I/O is performed. To accomplish this, MACSio_ implements what amount to a *virtual file*
+   such that all I/O operations performed by a task are captured in this *vitual file*.
+   Aggregation is performed by message passing these virtual files to aggregator tasks
+   which essentially turn around and replay.
+
+MACSio_'s MIF_ Package and `SCR`_
+"""""""""""""""""""""""""""""""""
 These MIF_ utilities are designed to support use in conjunction with the 
-`Scalable Checkpoint / Restart
-<https://scr.readthedocs.io/en/latest/index.html>`_ library.
-However, use of SCR may place additional restrictions on the tasks-to-files
-mapping depending, partially, on whether SCR is configured to write to
-node-local storage. For example, SCR is typically supported only in
+Scalable Checkpoint / Restart (`SCR`_) library.
+However, use of `SCR`_ may place additional restrictions on the tasks-to-files
+mapping depending, partially, on whether `SCR`_ is configured to write to
+node-local storage. For example, `SCR`_ is typically supported only in
 file-per-processor mappings.
 
 MIF_ API
@@ -133,3 +166,7 @@ MIF_ API
 
     .. doxygenstruct:: _MACSIO_MIF_baton_t
 
+Single Shared File (SSF) Parallel I/O
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _SCR : https://scr.readthedocs.io/en/latest/index.html

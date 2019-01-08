@@ -56,7 +56,7 @@ Randomization
 Randomization of various of MACSio_'s behaviors may be explicitly enforced or
 prevented. However, to ensure such behaviors, random number generation needs
 to be handled carefully especially when dealing with reproducibility from run
-to run and/or across parallel tasks or both.
+to run and/or agreement across parallel tasks or both.
 
 For this reason, MACSio_ creates and initializes several *default* pseudo random
 number generators (PRNGs), all of which utilize the C standard library

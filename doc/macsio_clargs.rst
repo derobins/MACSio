@@ -25,7 +25,7 @@ and assign values associated with them either to caller-supplied scalar variable
 json_object. The work-horse function, :any:`MACSIO_CLARGS_ProcessCmdline`, is used in the
 following manner...
 
-After the \c argi, \c argc, \c argv trio of arguments, the remaining arguments
+After the ``argi``, ``argc``, ``argv`` trio of arguments, the remaining arguments
 come in groups of either 3 (when mapping to a json_object) or 4 (when
 mapping to scalar program variables).
 
@@ -36,27 +36,27 @@ the number of parameters. Presently, it understands only %d, %f and %s types.
 The second is a string argument indicating the default value, as a string.
 
 The third is a help string for the argument. Note, you can make this string as
-long as the C-compiler will permit. You *need*not* embed any newline
+long as the C-compiler will permit. You *should not* embed any newline
 characters as the routine to print the help string will do that for you.
 However, you may embed newline characters if you wish to control specific line
 breaking when output.
 
 The fourth argument is present only when mapping to scalar program variables
-and is a pointer to the variable locations where values will be stored.
+and is a pointer to the variable location(s) where values will be stored.
 
 Command line arguments for which only existence on the command-line is tested
-assume a caller-supplied return value of int and will be assigned `1` if the
-argument exists on the command line and `0` otherwise.
+assume a caller-supplied return value of int and will be assigned ``1`` if the
+argument exists on the command line and ``0`` otherwise.
 
-Do not name any argument with a substring \c `help` as that is reserved for
-obtaining help. Also, do not name any argument with the string `end_of_args`
+Do not name any argument with a substring ``help`` as that is reserved for
+obtaining help. Also, do not name any argument with the string ``end_of_args``
 as that is used to indicate the end of the list of arguments passed to the function.
 
-If any argument on the command line has the substring `help`, help will be
-printed by processor 0 and then this function calls MPI_Finalize()
-(in parallel) and exit().
+If any argument on the command line has the substring ``help``, help will be
+printed by task 0 and then this function calls ``MPI_Finalize()``
+(in parallel) and ``exit(1)``.
 
-This function must be called collectively in MPI_COMM_WORLD. All tasks are
+This function must be called collectively in ``MPI_COMM_WORLD``. All tasks are
 guaranteed to complete with identical results.
 
 CLARGS API
@@ -79,13 +79,13 @@ Example
     flags.route_mode = MACSIO_CLARGS_TOMEM;
 
     MACSIO_CLARGS_ProccessCmdline(obj, flags, argi, argc, argv,
-        "-multifile", "",
+        "--multifile", "", /* example boolean with no default */
             "if specified, use a file-per-timestep",
             &doMultifile,
-        "-numCycles %d", "10",
+        "--numCycles %d", "10", /* example integer with default of 10 */
             "specify the number of cycles to run",
             &numCycles,
-        "-dims %d %f %d %f", "25 5 35 7",
+        "--dims %d %f %d %f", "25 5 35 7", /* example multiple values */
             "specify size (logical and geometric) of mesh",
             &Ni, &Xi, &Nj, &Xj,
     MACSIO_CLARGS_END_OF_ARGS);
@@ -93,24 +93,31 @@ Example
 .. code-block:: shell
 
     ./macsio --help
+    Usage and Help for "./macsio" Defaults, if any, in square brackets after argument definition
+      --multifile [] if specified, use a file-per-timestep
+      --numCycles %d [10] specify the number of cycles to run
+      --dims %d %f %d %f [25 5 35 7] specify size (logical and geometric) of mesh
 
 .. only:: internals
 
     Implementation Issues
     ^^^^^^^^^^^^^^^^^^^^^
 
-    However, the implementation has a few weaknesses which should be fixed
+    The implementation has a few weaknesses which should be fixed
 
     * Overly complex implementation
-    * Inconsistencies in JSON and MEM usage
+    * Inconsistencies in JSON and MEM routing usage
         * JSON handles *boolean* as *boolean*. MEM handles *boolean* as *int*.
         * When no-assign defaults is used, TOJSON routing creates JSON object which is
           missing the default entries entirely whereas TOMEM routing leaves specified
           memory locations untouched.
     * Do we really need *all* the english language help for an option in the executable itself?
         * Could put one-liners in the code and a URL to the RTD help page with full text there
+        * Does create a bit more of a maintenance burden in that most changes then require
+          editing two places.
     * Help output is raggedy and unprofessional looking
-    * piping through ``fmt`` seems to have helped a bit
+        * Adding piping through ``fmt`` seems to have helped a bit
+        * Identation of argument groups is funky
     * Uses ``%f`` for *double* arguments. Should be ``%g``.
     * error logging dependency
     * in parallel MPI_COMM_WORLD is assumed
