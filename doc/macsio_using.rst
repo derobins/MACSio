@@ -322,3 +322,22 @@ and average part count to hit that target global size. We demonstrate this in th
 
 It might also be appropriate to perform a strong scaling study in SIF parallel I/O mode as well.
 In that case, just replace the trailing ``MIF $nf`` in the MACSio_ command line above with ``SIF``.
+
+Validating Data MACSio Produces
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For properly written plugins, the data produced by MACSio_ should be visualizable in various
+visualization tools such as VisIt, ParaView or Ensight.
+
+
+.. figure:: macsio_vis1.png
+   :width: 60%
+   :align: center
+
+   VisIt displaying MACSio_ produced data on 4 tasks and 2.5 parts per task with the Silo plugin
+
+.. figure:: macsio_vis2.png
+   :width: 60%
+   :align: center
+
+   VisIt displaying MACSio_ produced data on 2048 tasks and 2.5 parts per task with the Silo plugin
