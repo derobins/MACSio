@@ -1,4 +1,324 @@
 Using MACSio_
 -------------
 
-Using MACSio_ to assess performance of various I/O workloads and scenarios.
+By default, MACSio_'s command-line arguments are designed to maintain constant
+I/O workload-per-task as task count is varied.  As task count is varied, this
+means MACSio_, by default, exhibits *weak scaling* behavior. This does not mean,
+however, that strong scaling behavior cannot be demonstrated. It only means
+extra work is involved in constructing command-line arguments to ensure
+*strong scaling* is exhibited.
+
+.. note:: Should enhance MACSio_ command-line to allow caller to indicate which
+          modality of scaling/sizing is desired and then treat sizing argument(s)
+          as either per-task or global.
+
+
+MACSio_ has a large number of command-line arguments. In addition, each plugin may
+define additional command-line arguments. Full documentation of all MACSio_'s 
+command-line arguments and their meaning can be obtained with the command
+
+.. code-block:: shell
+
+   % ./macsio --help | more
+
+Be ready for a lot of output!
+
+Here, we will describe only some of the basic arguments necessary to do initial
+testing that MACSio_ is installed correctly and to scale to large sizes.
+
+All command-line arguments specified *after* the keyword argument ``--plugin_args``
+are passed to the plugin and not interpreted by MACSio_'s main.
+
+.. note:: Fix terminology here. We're using --interface to specify the name of the plugin
+          and later --plugin_args. Maybe just stick with 'plugin'. A similar issue exists
+          with 'rank' vs. 'task'.
+
+.. note:: We should create a glossary of terms
+
+Summary of Key Command Line Arguments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+MACSio_ is different from other I/O benchmarking applications because it constructs
+and marshals data as real data objects commonly used in scientific computing applications.
+All of its command-line arguments are designed in these terms and one has to understand
+how those choices effect I/O workload created by MACSio_.
+
+Default values for all command-line arguments are indicated in square brackets.
+
+.. _interface_clarg
+
+--interface : ``--interface %s [miftmpl]``
+      Specify the name of the interface (e.g. plugin) to be tested. Use keyword
+      `list` to print a list of all known interface names and then exit.
+      Examples:
+
+         * Get list of available plugins
+
+         .. code-block:: shell
+
+            % ./macsio --interface list
+            List of available I/O-library plugins...
+            "miftmpl", "hdf5", "silo", "typhonio"
+
+         * Use the HDF5 plugin for a given test
+
+         .. code-block:: shell
+
+            % ./macsio --interface hdf5
+
+--parallel_file_mode : ``--parallel_file_mode %s %d [MIF 4]``
+    Specify the parallel file mode. There are several choices.  Not all parallel
+    modes are supported by all plugins. Use 'MIF' for Multiple Independent File
+    mode and then also specify the number of files. Or, use 'MIFFPP' for MIF
+    mode and one file per processor and where macsio uses known processor count.
+    Use 'MIFOPT' for MIF mode and let MACSio_ determine an *optimum* file count
+    based on heuristics. Use 'SIF' for SIngle shared File mode. If you also give a
+    file count for SIF mode, then MACSio_ will perform a sort of hybrid combination
+    of MIF and SIF modes.  It will produce the specified number of files by grouping
+    ranks in the the same way MIF does, but I/O within each group will be to a single,
+    shared file using SIF mode and a subsetted communicator. When using SIF parallel
+    mode, be sure you are running on a true parallel file system (e.g. GPFS or Lustre).
+
+--part_type : ``--part_type %s [rectilinear]``
+    Options are 'uniform', 'rectilinear', 'curvilinear', 'unstructured' and 'arbitrary'.
+    Generally, this option impacts only the I/O worload associated with the mesh object
+    itself and not any variables defined on the mesh.
+
+--part-dim : ``--part_dim %d [2]``
+    Spatial dimension of mesh parts; 1, 2, or 3. In most cases, 2 is a good choice
+    because it makes downstream visualization of MACSio_ data more natural.
+    While MACSio_ is designed such that we would not ordinarily expect I/O workload
+    to be substantially different for different spatial dimensions, this isn't always
+    known to be true for all possible plugins ahead of time.
+
+--part_size : ``--part_size %d [80000]``
+    Per-task mesh part size. This becomes the *nominal* I/O request size used by each
+    task rank when marshalling data. A following ``B`` | ``K`` | ``M`` | ``G`` character
+    indicates 'B'ytes, 'K'ilo-, 'M'ega- or 'G'iga- bytes representing powers of either
+    1000 or 1024 depending on the selected units prefix system. With no size modifier
+    character, 'B'ytes is assumed.  Mesh and variable data is then sized by MACSio to
+    hit this target byte count in I/O requests.  However, due to constraints involved in
+    creating valid mesh topology and variable data with realistic variation in features
+    (e.g.  zone- and node-centering), this target byte count is hit exactly for only the
+    most frequently dumped objects and approximately for other objects.
+
+--avg_num_parts : ``--avg_num_parts %f [1]``
+    The average number of mesh parts per task.
+    Non-integral values are acceptable. For example, a value that is half-way
+    between two integers, K and K+1, means that half the ranks have K mesh
+    parts and half have K+1 mesh parts, a typical scanrio for multi-physics
+    applications. As another example, a value of 2.75 here would mean that 75%
+    of the ranks get 3 parts and 25% of the ranks get 2 parts. Note that the total
+    number of parts is this number multiplied by the task count. If the result of
+    that product is non-integral, it will be rounded and a warning message will be
+    generated.
+
+--vars_per_part : ``--vars_per_part %d [20]``
+    Number of mesh variables on each part. This controls the *number* of I/O requests
+    each task makes to complete a given dump. Typical physics simulations run
+    with anywhere from just a few effectively to several hundred mesh variables.
+    Note that the choice in mesh part_type sets a lower bound on the effective number
+    of mesh variables marshaled by MACSio_ due to the storage involved for the
+    mesh coordinate and topology data alone. For example, for a uniform mesh this
+    lower bound is effectively zero because there is no coordinate or topology data
+    for the mesh itself.  This is also almost true for rectilinear meshes.
+    For curvilinear mesh the lower bound is the number of spatial dimensions and for
+    unstructured mesh it is the number of spatial dimensions plus 2^number of
+    topological dimensions.
+
+.. note:: uniform vs. rectilinear not fully defined here.
+
+--num_dumps : ``--num_dumps %d [10]``
+    Total number of dumps to marshal
+
+--dataset_growth : ``--dataset_growth %f [1]``
+    A multiplier factor by which the volume of data will grow
+    between dump iterations If no value is given or the value is <1.0 no
+    dataset changes will take place.
+
+.. note:: This should be changed to generalized to include not just enlargement
+          but shrinkage and perhaps even some randomness in the direction and
+          amount of change in size from dump to dump.
+
+--meta_type : ``--meta_type %s [tabular]``
+    Specify the type of metadata objects to include in
+    each main dump.  Options are 'tabular' or 'amorphous'. For tabular type
+    data, MACSio will generate a random set of tables of somewhat random
+    structure and content. For amorphous, MACSio will generate a random
+    hierarchy of random type and sized objects.
+
+--meta_size : ``--meta_size %d %d [10000 50000]``
+    Specify the size of the metadata objects on
+    each processor and separately, the root (or master) processor (MPI rank
+    0). The size is specified in terms of the total number of bytes in the
+    metadata objects MACSio creates. For example, a type of tabular and a size
+    of 10K bytes might result in 3 random tables; one table with 250 unnamed
+    records where each record is an array of 3 doubles for a total of 6000
+    bytes, another table of 200 records where each record is a named integer
+    value where each name is length 8 chars for a total of 2400 bytes and a
+    3rd table of 40 unnamed records where each record is a 40 byte struct
+    comprised of ints and doubles for a total of 1600 bytes.
+
+.. note:: These should be changed to allow for multiple random tables and/or
+          random key/val hierarchies.
+
+--compute_work_intensity : ``--compute_work_intensity %d [0]``
+    Add some compute workload (e.g. give the processors something to do)
+    between I/O dumps. There are three levels of 'compute' that can be performed
+    as follows:
+
+          * Level 1: Perform a basic sleep operation (this is the default)
+          * Level 2: Perform some simple FLOPS with randomly accessed data
+          * Level 3: Solves the 2D Poisson equation via the Jacobi iterative method
+
+    This input is intended to be used in conjunection with --compute_time
+    which will roughly control how much time is spent doing work between dumps.
+
+--time_randomize : ``--time_randomize [0]``
+    Make randomness in MACSio vary from dump to dump and run to run by using PRNGs
+    seeded by time.
+
+--plugin-args : ``--plugin_args``
+    All arguments after this sentinel are passed to the I/O plugin plugin.
+
+MACSio_ Command Line Examples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* To run with Multiple Independent File (MIF) mode to on 93 tasks to 8 HDF5 files...
+
+  .. code-block:: shell
+
+     mpirun -np 93 macsio --interface hdf5 --parallel_file_mode MIF 8
+
+* Same as above to but a Single Shared File (SIF) mode to 1 HDF5 file (note: this
+  is possible with the same plugin because the HDF5 plugin in MACSio_ has been
+  designed to support both the MIF and SIF parallel I/O modes.
+
+  .. code-block:: shell
+
+     mpirun -np 93 macsio --interface hdf5 --parallel_file_mode SIF 1
+
+* Default per-proc request size is 80,0000 bytes (10K doubles). To use a different
+  request size, use --part_size. For example, to run on 128 tasks, 8 files in MIF
+  mode where I/O request size is 10 megabytes, use
+
+  .. code-block:: shell
+
+     mpirun -np 128 macsio --interface hdf5 --parallel_file_mode MIF 8 --part_size 10M
+
+  Here, the ``M`` after the ``10`` means either decimal Megabytes (Mb) or binary
+  Mibibytes (Mi) depending on setting for --units_prefix_system. Default is binary.
+
+* To use H5Z-ZFP compression plugin, be sure to have the plugin compiled and available
+  with the same compiler and version of HDF5 you are using with MACSio_. Here, we 
+  demonstrate a MACSio_ command line that runs on 4 tasks, does MIF parallel I/O mode
+  to 2 files, on a two dimensional, rectilinear mesh with an average number of parts per
+  task of 2.5 and a nominal I/O request size of 40,000 bytes. The args after ``--plugin-args``
+  are to specify ZFP compression parameters to the HDF5 plugin. In this case, we use
+  ZFP library in *rate* mode with a bit-rate of 4.
+
+  .. code-block:: shell
+
+     env HDF5_PLUGIN_PATH=<path-to-plugin-dir> mpirun -np 4 ./macsio --interface hdf5 --parallel_file_mode MIF 2 --avg_num_parts 2.5 --part_size 40000 --part_dim 2 --part_type rectilinear --num_dumps 2 --plugin_args --compression zfp rate=4
+
+  where ``path-to-plugin-dir`` is the path to the directory containing ``libh5zzfp.{a,so,dylib}``
+
+Weak Scaling Study Command-Line Example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Suppose you want to perform a weak scaling study with MACSio_ in MIF parllel I/O mode
+and where per-task I/O requests are nominally 100 kilobytes and each task has 8
+mesh parts.
+
+All MACSio_ command line arguments remain the same. The only difference is the task
+count you execute MACSio_ with.
+
+.. code-block:: shell
+
+   for n in 32 64 128 256 512 1024 2048 4096
+   do
+       mpirun -np $n macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 32
+   done
+
+Now, the above example *started* with a task count of 32 and 32 files in MIF mode and
+kept the file count constant. It is concievable that if you continued this study to
+larger and larger scales, you may also want the MIF file count to vary somewhat as well
+Here is an example of doing that.
+
+.. code-block:: shell
+
+   # function to map task count to MIF file count
+   nfiles()
+   {
+       if [[ $1 -le 32 ]]; then
+           echo 32
+       elif [[ $1 -le 8192 ]]; then
+           echo 64
+       elif [[ $1 -le 65536 ]]; then
+           echo 128
+       else
+           echo 256
+       fi
+   }
+
+   n=32
+   while [[ $n -le 262144 ]] ; do
+       nf=nfiles $n
+       mpirun -np $n macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF $nf
+       n=$(expr $n \* 2)
+   done
+
+Strong Scaling Study Command-Line Example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Suppose we wish to perform a *strong* scaling study. In this case, we need to settle upon the global
+final mesh size and then construct MACSio_ command lines for each run such that the task count
+together with the per-task command-line arguments results in the same (or approximately so) global
+final mesh object in each run.
+
+In the preceding *weak* scaling example, MACSio_ generated a *global* mesh of size in the range
+[8*32*100K, 8*262144*100K]. Selecting a middle-of-the-range run of 8*8192*100K (6,710,886,400 bytes)
+as a *nominal* *global* mesh size, we can then use a given task count to determine part size
+and average part count to hit that target global size. We demonstrate this in the following code block...
+
+.. code-block:: shell
+
+   # target total byte count
+   ttbc=6710886400
+
+   nparts_and_part_size()
+   {
+       # start by assming just one part per task
+       nparts=1
+
+       # nominal part size is total target size divided by
+       # number of tasks (arg $1 to function). Note that
+       # integer arithmetic here will cause some variation from
+       # target ttbc
+       psize=$(expr $ttbc / $1)
+
+       # if the part size is bigger than the 100K we used in the weak study,
+       # lets reduce it and then increase the number of parts
+       if [[ $psize -ge 102400 ]]; then
+           nparts=$(echo "$psize/102400" | bc -l)
+       fi
+
+       echo $nparts $psize
+   }
+
+   n=32
+   while [[ $n -le 262144 ]] ; do
+       nparts=$(nparts_and_part_size $n | cut -d' ' -f1)
+       psize=$(nparts_and_part_size $n | cut -d' ' -f2)
+       nf=$n
+       # allow file count to trak task count to 1024 tasks
+       # then keep it constant after that
+       if [[ $nf -ge 1024 ]]; then
+           nf=1024
+       fi
+       mpirun -np $n macsio --interface hdf5 --avg_num_parts $nparts --part_size $psize --parallel_file_mode MIF $nf
+       n=$(expr $n \* 2)
+   done
+
+It might also be appropriate to perform a strong scaling study in SIF parallel I/O mode as well.
+In that case, just replace the trailing ``MIF $nf`` in the MACSio_ command line above with ``SIF``.

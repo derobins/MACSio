@@ -225,7 +225,7 @@ static json_object *ProcessCommandLine(int argc, char *argv[], int *plugin_argi)
             "be depends on the mesh type. For rectilinear mesh it is 1. For\n"
             "curvilinear mesh it is the number of spatial dimensions and for\n"
             "unstructured mesh it is the number of spatial dimensions plus\n"
-            "2^number of topological dimensions. [50]",
+            "2^number of topological dimensions.",
         "--dataset_growth %f", MACSIO_CLARGS_NODEFAULT, 
             "The factor by which the volume of data will grow between dump iterations\n"
             "If no value is given or the value is <1.0 no dataset changes will take place.",
