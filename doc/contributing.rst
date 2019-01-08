@@ -12,4 +12,4 @@ Contributing to MACSio Documentation
   * Use ``.. only:: internals`` to conditionally include blocks that are used solely to document
     internal functionality of a given package. See example in ``macsio_mif.rst``.
   * To build locally
-    ``env BUILD_LOCAL=1 READTHEDOCS=1 sphinx-build -b html . _build -a [-t internals]``
+    ``env DONT_INSTALL_BREATHE=1 READTHEDOCS=1 sphinx-build -b html . _build -a [-t internals]``

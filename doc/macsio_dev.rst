@@ -10,9 +10,14 @@ Welcome to MACSio Documentation
    :maxdepth: 2
    :caption: Contents:
 
-   Building MACSio <macsio_building>
-   Using MACSio <macsio_using>
-   Developing MACSio <macsio_dev>
+   macsio_main
+   macsio_data
+   Plugins <macsio_iface>
+   MIF Parallel <macsio_mif>
+   Arg Parsing <macsio_clargs>
+   macsio_timing
+   macsio_log
+   contributing
 
 * :ref:`genindex`
 * :ref:`modindex`
