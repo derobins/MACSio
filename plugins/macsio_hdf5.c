@@ -856,7 +856,7 @@ static void
 main_dump(
     int argi, /**< arg index at which to start processing \c argv */
     int argc, /**< \c argc from main */
-    char **argv, /**< \argv from main */
+    char **argv, /**< \c argv from main */
     json_object *main_obj, /**< main json data object to dump */
     int dumpn, /**< dump number */
     double dumpt /**< dump time */

@@ -2,15 +2,17 @@ Using MACSio_
 -------------
 
 By default, MACSio_'s command-line arguments are designed to maintain constant
-I/O workload-per-task as task count is varied.  As task count is varied, this
-means MACSio_, by default, exhibits *weak scaling* behavior. This does not mean,
-however, that strong scaling behavior cannot be demonstrated. It only means
-extra work is involved in constructing command-line arguments to ensure
-*strong scaling* is exhibited.
+per-task I/O workload as task count is varied. This means MACSio_, by default,
+exhibits *weak scaling* behavior. This does not mean, however, that strong scaling
+scenarios cannot be handled. It means only that extra work is involved in
+constructing command-line arguments to ensure a *strong scaling* goal is achieved
+if that is desired.
 
-.. note:: Should enhance MACSio_ command-line to allow caller to indicate which
-          modality of scaling/sizing is desired and then treat sizing argument(s)
-          as either per-task or global.
+.. only:: internals
+
+   .. note:: Should enhance MACSio_ command-line to allow caller to indicate which
+             modality of scaling/sizing is desired and then treat sizing argument(s)
+             as either per-task or global.
 
 
 MACSio_ has a large number of command-line arguments. In addition, each plugin may
@@ -29,23 +31,29 @@ testing that MACSio_ is installed correctly and to scale to large sizes.
 All command-line arguments specified *after* the keyword argument ``--plugin_args``
 are passed to the plugin and not interpreted by MACSio_'s main.
 
-.. note:: Fix terminology here. We're using --interface to specify the name of the plugin
-          and later --plugin_args. Maybe just stick with 'plugin'. A similar issue exists
-          with 'rank' vs. 'task'.
+.. only:: internals
 
-.. note:: We should create a glossary of terms
+   .. note:: Should enhance --help to allow getting help on just one plugin's
+             options.
+
+   .. note:: Fix terminology here. We're using --interface to specify the name of the plugin
+             and later --plugin_args. Maybe just stick with 'plugin'. A similar issue exists
+             with 'rank' vs. 'task'.
+
+   .. note:: We should create a glossary of terms
 
 Summary of Key Command Line Arguments
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-MACSio_ is different from other I/O benchmarking applications because it constructs
-and marshals data as real data objects commonly used in scientific computing applications.
-All of its command-line arguments are designed in these terms and one has to understand
-how those choices effect I/O workload created by MACSio_.
+MACSio_ is different from I/O benchmarking tools because it constructs and marshals data
+as real data objects commonly used in scientific computing applications. All of its
+command-line arguments are designed in these terms and one has to understand how those
+choices effect I/O workload created by MACSio_.
 
-Default values for all command-line arguments are indicated in square brackets.
+In the descriptions below, default values for all command-line arguments are indicated
+in square brackets.
 
-.. _interface_clarg
+.. _interface_clarg:
 
 --interface : ``--interface %s [miftmpl]``
       Specify the name of the interface (e.g. plugin) to be tested. Use keyword
@@ -79,28 +87,34 @@ Default values for all command-line arguments are indicated in square brackets.
     shared file using SIF mode and a subsetted communicator. When using SIF parallel
     mode, be sure you are running on a true parallel file system (e.g. GPFS or Lustre).
 
+.. only:: internals
+
+   .. note:: A plugin should specify which modes it supports.
+
 --part_type : ``--part_type %s [rectilinear]``
     Options are 'uniform', 'rectilinear', 'curvilinear', 'unstructured' and 'arbitrary'.
     Generally, this option impacts only the I/O worload associated with the mesh object
-    itself and not any variables defined on the mesh.
+    itself and not any variables defined on the mesh. However, not all I/O libraries
+    (or their associated MACSio_ plugins) support all mesh types and when making
+    comparisons it is important to have the option of specifying various mesh types.
 
 --part-dim : ``--part_dim %d [2]``
     Spatial dimension of mesh parts; 1, 2, or 3. In most cases, 2 is a good choice
-    because it makes downstream visualization of MACSio_ data more natural.
+    because it makes downstream visualization of MACSio_ data easier and more natural.
     While MACSio_ is designed such that we would not ordinarily expect I/O workload
     to be substantially different for different spatial dimensions, this isn't always
     known to be true for all possible plugins ahead of time.
 
 --part_size : ``--part_size %d [80000]``
     Per-task mesh part size. This becomes the *nominal* I/O request size used by each
-    task rank when marshalling data. A following ``B`` | ``K`` | ``M`` | ``G`` character
+    task when marshaling data. A following ``B`` | ``K`` | ``M`` | ``G`` character
     indicates 'B'ytes, 'K'ilo-, 'M'ega- or 'G'iga- bytes representing powers of either
     1000 or 1024 depending on the selected units prefix system. With no size modifier
-    character, 'B'ytes is assumed.  Mesh and variable data is then sized by MACSio to
+    character, 'B'ytes is assumed.  Mesh and variable data is then sized by MACSio_ to
     hit this target byte count in I/O requests.  However, due to constraints involved in
     creating valid mesh topology and variable data with realistic variation in features
     (e.g.  zone- and node-centering), this target byte count is hit exactly for only the
-    most frequently dumped objects and approximately for other objects.
+    most commonly used objects and approximately for other objects.
 
 --avg_num_parts : ``--avg_num_parts %f [1]``
     The average number of mesh parts per task.
@@ -136,9 +150,11 @@ Default values for all command-line arguments are indicated in square brackets.
     between dump iterations If no value is given or the value is <1.0 no
     dataset changes will take place.
 
-.. note:: This should be changed to generalized to include not just enlargement
-          but shrinkage and perhaps even some randomness in the direction and
-          amount of change in size from dump to dump.
+.. only:: internals
+
+   .. note:: This should be changed to generalized to include not just enlargement
+             but shrinkage and perhaps even some randomness in the direction and
+             amount of change in size from dump to dump.
 
 --meta_type : ``--meta_type %s [tabular]``
     Specify the type of metadata objects to include in
@@ -149,9 +165,9 @@ Default values for all command-line arguments are indicated in square brackets.
 
 --meta_size : ``--meta_size %d %d [10000 50000]``
     Specify the size of the metadata objects on
-    each processor and separately, the root (or master) processor (MPI rank
+    each task and separately, the root (or master) task (MPI rank
     0). The size is specified in terms of the total number of bytes in the
-    metadata objects MACSio creates. For example, a type of tabular and a size
+    metadata objects MACSio_ creates. For example, a type of tabular and a size
     of 10K bytes might result in 3 random tables; one table with 250 unnamed
     records where each record is an array of 3 doubles for a total of 6000
     bytes, another table of 200 records where each record is a named integer
@@ -159,8 +175,10 @@ Default values for all command-line arguments are indicated in square brackets.
     3rd table of 40 unnamed records where each record is a 40 byte struct
     comprised of ints and doubles for a total of 1600 bytes.
 
-.. note:: These should be changed to allow for multiple random tables and/or
-          random key/val hierarchies.
+.. only:: internals
+
+   .. note:: These should be changed to allow for multiple random tables and/or
+             random key/val hierarchies.
 
 --compute_work_intensity : ``--compute_work_intensity %d [0]``
     Add some compute workload (e.g. give the processors something to do)
@@ -175,8 +193,8 @@ Default values for all command-line arguments are indicated in square brackets.
     which will roughly control how much time is spent doing work between dumps.
 
 --time_randomize : ``--time_randomize [0]``
-    Make randomness in MACSio vary from dump to dump and run to run by using PRNGs
-    seeded by time.
+    Make :ref:`randomization <macsio_data_randomization>` in MACSio_ vary from
+    dump to dump within a given run and from run to run by using PRNGs seeded by time.
 
 --plugin-args : ``--plugin_args``
     All arguments after this sentinel are passed to the I/O plugin plugin.
@@ -198,7 +216,7 @@ MACSio_ Command Line Examples
 
      mpirun -np 93 macsio --interface hdf5 --parallel_file_mode SIF 1
 
-* Default per-proc request size is 80,0000 bytes (10K doubles). To use a different
+* Default per-proc request size is 80,000 bytes (10K doubles). To use a different
   request size, use --part_size. For example, to run on 128 tasks, 8 files in MIF
   mode where I/O request size is 10 megabytes, use
 
@@ -207,7 +225,7 @@ MACSio_ Command Line Examples
      mpirun -np 128 macsio --interface hdf5 --parallel_file_mode MIF 8 --part_size 10M
 
   Here, the ``M`` after the ``10`` means either decimal Megabytes (Mb) or binary
-  Mibibytes (Mi) depending on setting for --units_prefix_system. Default is binary.
+  Mibibytes (Mi) depending on setting for ``--units_prefix_system``. Default is binary.
 
 * To use H5Z-ZFP compression plugin, be sure to have the plugin compiled and available
   with the same compiler and version of HDF5 you are using with MACSio_. Here, we 
@@ -242,7 +260,7 @@ count you execute MACSio_ with.
 
 Now, the above example *started* with a task count of 32 and 32 files in MIF mode and
 kept the file count constant. It is concievable that if you continued this study to
-larger and larger scales, you may also want the MIF file count to vary somewhat as well
+larger and larger scales, you may also want the MIF file count to vary somewhat as well.
 Here is an example of doing that.
 
 .. code-block:: shell
@@ -322,6 +340,29 @@ and average part count to hit that target global size. We demonstrate this in th
 
 It might also be appropriate to perform a strong scaling study in SIF parallel I/O mode as well.
 In that case, just replace the trailing ``MIF $nf`` in the MACSio_ command line above with ``SIF``.
+
+Assessing Performance Achieved by MACSio
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Performance data is captured by MACSio_ as :ref:`timers <macsio_timing>` and then dumped 
+to strings (see :any:`MACSIO_TIMING_DumpTimersToStrings` for specific format of dumped
+timer data strings) for output to a :ref:`log <macsio_loggng>` file upon exit.
+
+The performance data gathered by MACSio_ is wholly dependent on the degree to which
+developers of MACSio_ or its plugins have instrumented MACSio_ with suitable timing
+calls. If timing information provided is not sufficient, the solution is to submit
+a PR with relevant timer calls added.
+
+Each task maintains its own unique set of timers for its own activities. In addition,
+MACSio_ will reduce all the task-specific timers just prior to test completion. All timer data,
+the task-specific timers together with the reduced timers, is then dumped to a MACSio_ log
+file with the name ``macsio-timings.log``. That single file captures all of the performance
+data for a given run of MACSio. 
+
+.. only:: internals
+
+   .. note:: We should change format of this file or provide tool to convert log file
+      contents to hbase or some other suitable big data format for archival storage and
+      analysis.
 
 Validating Data MACSio Produces
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -204,21 +204,21 @@ timer groups.
 Each timer is dumped to a string with the following informational fields catenated together and 
 separated by colons...
 
-  - TOT=%10.5f total amount of time spent in this time over all iterations (and ranks when reduced)
-  - CNT=%04d total number of iterations this timer was triggered (over all ranks when reduced)
+  - TOT=%10.5f summed total time spent in this timer over all iterations (and over all ranks when reduced)
+  - CNT=%04d summed total total number of iterations in this timer (and over all ranks when reduced)
   - MIN=%8.5f(%4.2f):%06d
     - minimum time recorded for this timer over all iterations (and ranks when reduced)
-    - (%4.2f) the number of standard deviations from the mean time
-    - :%06d the rank (when reduced) where the minimum was observed.
+    - (%4.2f) the number of standard deviations of the min from the mean time
+    - :%06d task rank where the minimum was observed (only valid when reduced)
   - AVG=%8.5f the mean time of this timer over all iterations (and ranks when reduced)
   - MAX=%8.5f(%4.2f):%06d,
     - maximum time recorded for this timer over all iterations (and ranks when reduced)
-    - (%4.2f) the number of standard deviations from the mean time
-    - :%06d the rank (when reduced) where the maximum was observed.
+    - (%4.2f) the number of standard deviations of the max from the mean time
+    - :%06d task rank where the maximum was observed. (only valid when reduced)
   - DEV=%8.8f standard deviation observed for all iterations of this timer
-  - FILE=%s the source file where this timer is triggered
-  - LINE=%d the source line number where this timer is triggered
-  - LAB=%s the user-defined label for this timer
+  - FILE=\%s the source file where this timer is triggered
+  - LINE=\%d the source line number where this timer is triggered
+  - LAB=\%s the user-defined label for this timer
 */
 extern void
 MACSIO_TIMING_DumpTimersToStrings(

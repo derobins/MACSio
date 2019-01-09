@@ -1,3 +1,5 @@
+.. _macsio_logging:
+
 Logging
 -------
 

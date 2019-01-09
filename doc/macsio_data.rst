@@ -50,6 +50,8 @@ similar kinds of data.
 
 .. doxygengroup:: MACSIO_RANDOBJ
 
+.. _macsio_data_randomization:
+
 Randomization
 ^^^^^^^^^^^^^
 
@@ -67,9 +69,9 @@ a series of state vectors for calls to initstate/setstate of C library
 `random() <http://man7.org/linux/man-pages/man3/random.3.html">`_
 and friends. Multiple different PRNGs are supported each having
 zero or more special properties depending on how they are initialized
-(e.g. the *seed* used from run to run and/or from task to task). However,
-properties of a PRNG also depend on the caller's usage. For example, if a
-PRNG is intended to cause each task to generate the same data, then it is up
+(e.g. the *seed* used from run to run and/or from task to task) as well
+as how they are expected to be used/called. For example, if a
+PRNG is intended to produce identical values on each task, then it is up
 to the caller to ensure the respective PRNG is called consistently (e.g. collectively)
 across tasks. Otherwise, unintended or indeterminent behavior may result.
 
