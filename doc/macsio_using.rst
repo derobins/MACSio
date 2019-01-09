@@ -68,7 +68,7 @@ in square brackets.
             List of available I/O-library plugins...
             "miftmpl", "hdf5", "silo", "typhonio"
 
-         * Use the HDF5 plugin for a given test
+         * Use the HDF5_ plugin for a given test
 
          .. code-block:: shell
 
@@ -76,14 +76,14 @@ in square brackets.
 
 --parallel_file_mode : ``--parallel_file_mode %s %d [MIF 4]``
     Specify the parallel file mode. There are several choices.  Not all parallel
-    modes are supported by all plugins. Use 'MIF' for Multiple Independent File
-    mode and then also specify the number of files. Or, use 'MIFFPP' for MIF
+    modes are supported by all plugins. Use 'MIF' for Multiple Independent File (MIF_)
+    mode and then also specify the number of files. Or, use 'MIFFPP' for MIF_
     mode and one file per processor and where macsio uses known processor count.
-    Use 'MIFOPT' for MIF mode and let MACSio_ determine an *optimum* file count
+    Use 'MIFOPT' for MIF_ mode and let MACSio_ determine an *optimum* file count
     based on heuristics. Use 'SIF' for SIngle shared File mode. If you also give a
     file count for SIF mode, then MACSio_ will perform a sort of hybrid combination
-    of MIF and SIF modes.  It will produce the specified number of files by grouping
-    ranks in the the same way MIF does, but I/O within each group will be to a single,
+    of MIF_ and SIF modes.  It will produce the specified number of files by grouping
+    ranks in the the same way MIF_ does, but I/O within each group will be to a single,
     shared file using SIF mode and a subsetted communicator. When using SIF parallel
     mode, be sure you are running on a true parallel file system (e.g. GPFS or Lustre).
 
@@ -202,37 +202,37 @@ in square brackets.
 MACSio_ Command Line Examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* To run with Multiple Independent File (MIF) mode to on 93 tasks to 8 HDF5 files...
+* To run with Multiple Independent File (MIF_) mode to on 93 tasks to 8 HDF5_ files...
 
   .. code-block:: shell
 
      mpirun -np 93 macsio --interface hdf5 --parallel_file_mode MIF 8
 
-* Same as above to but a Single Shared File (SIF) mode to 1 HDF5 file (note: this
-  is possible with the same plugin because the HDF5 plugin in MACSio_ has been
-  designed to support both the MIF and SIF parallel I/O modes.
+* Same as above to but a Single Shared File (SIF) mode to 1 HDF5_ file (note: this
+  is possible with the same plugin because the HDF5_ plugin in MACSio_ has been
+  designed to support both the MIF_ and SIF parallel I/O modes.
 
   .. code-block:: shell
 
      mpirun -np 93 macsio --interface hdf5 --parallel_file_mode SIF 1
 
 * Default per-proc request size is 80,000 bytes (10K doubles). To use a different
-  request size, use --part_size. For example, to run on 128 tasks, 8 files in MIF
+  request size, use --part_size. For example, to run on 128 tasks, 8 files in MIF_
   mode where I/O request size is 10 megabytes, use
 
   .. code-block:: shell
 
-     mpirun -np 128 macsio --interface hdf5 --parallel_file_mode MIF 8 --part_size 10M
+     mpirun -np 128 macsio --interface hdf5 --parallel_file_mode MIF_ 8 --part_size 10M
 
   Here, the ``M`` after the ``10`` means either decimal Megabytes (Mb) or binary
   Mibibytes (Mi) depending on setting for ``--units_prefix_system``. Default is binary.
 
 * To use H5Z-ZFP compression plugin, be sure to have the plugin compiled and available
-  with the same compiler and version of HDF5 you are using with MACSio_. Here, we 
-  demonstrate a MACSio_ command line that runs on 4 tasks, does MIF parallel I/O mode
+  with the same compiler and version of HDF5_ you are using with MACSio_. Here, we 
+  demonstrate a MACSio_ command line that runs on 4 tasks, does MIF_ parallel I/O mode
   to 2 files, on a two dimensional, rectilinear mesh with an average number of parts per
   task of 2.5 and a nominal I/O request size of 40,000 bytes. The args after ``--plugin-args``
-  are to specify ZFP compression parameters to the HDF5 plugin. In this case, we use
+  are to specify ZFP compression parameters to the HDF5_ plugin. In this case, we use
   ZFP library in *rate* mode with a bit-rate of 4.
 
   .. code-block:: shell
@@ -244,7 +244,7 @@ MACSio_ Command Line Examples
 Weak Scaling Study Command-Line Example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Suppose you want to perform a weak scaling study with MACSio_ in MIF parllel I/O mode
+Suppose you want to perform a weak scaling study with MACSio_ in MIF_ parllel I/O mode
 and where per-task I/O requests are nominally 100 kilobytes and each task has 8
 mesh parts.
 
@@ -258,9 +258,9 @@ count you execute MACSio_ with.
        mpirun -np $n macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 32
    done
 
-Now, the above example *started* with a task count of 32 and 32 files in MIF mode and
+Now, the above example *started* with a task count of 32 and 32 files in MIF_ mode and
 kept the file count constant. It is concievable that if you continued this study to
-larger and larger scales, you may also want the MIF file count to vary somewhat as well.
+larger and larger scales, you may also want the MIF_ file count to vary somewhat as well.
 Here is an example of doing that.
 
 .. code-block:: shell
@@ -338,8 +338,8 @@ and average part count to hit that target global size. We demonstrate this in th
        n=$(expr $n \* 2)
    done
 
-It might also be appropriate to perform a strong scaling study in SIF parallel I/O mode as well.
-In that case, just replace the trailing ``MIF $nf`` in the MACSio_ command line above with ``SIF``.
+To perform a strong scaling study in SIF parallel I/O mode, just replace the trailing
+``MIF $nf`` in the above MACSio_ command line above with ``SIF``.
 
 Assessing Performance Achieved by MACSio
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -353,32 +353,48 @@ calls. If timing information provided is not sufficient, the solution is to subm
 a PR with relevant timer calls added.
 
 Each task maintains its own unique set of timers for its own activities. In addition,
-MACSio_ will reduce all the task-specific timers just prior to test completion. All timer data,
+MACSio_ will reduce all the task-specific timers just prior to completion. All timer data,
 the task-specific timers together with the reduced timers, is then dumped to a MACSio_ log
 file with the name ``macsio-timings.log``. That single file captures all of the performance
 data for a given run of MACSio. 
 
 .. only:: internals
 
-   .. note:: We should change format of this file or provide tool to convert log file
-      contents to hbase or some other suitable big data format for archival storage and
-      analysis.
+   .. note:: We should provide tool to convert log file contents to hbase or some other
+             suitable big data format for archival storage and analysis.
+
+   .. note:: In order to capture per-dump timing data, we would need a log file that is
+             a) created at beginning of run so that each dump's data can be added and b)
+             has enough lines reserved to capture all. How do we do that? If timers had
+             "level-of-detail" kind of knob, then we could write per-dump timers at
+             coarser levels of detail to minimize usage of reserved space in log.
+
+             Another option is to hold timing data in memory and then message pass each
+             task's data to a single file writer task that outputs it to disk at termination.
 
 Validating Data MACSio Produces
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For properly written plugins, the data produced by MACSio_ should be visualizable in various
-visualization tools such as VisIt, ParaView or Ensight.
+Most MACSio_ plugins produce *valid* scientific computing data which can be processed by
+other common *workflow* tools and, in particular, visualization tools such as
+VisIt_, `ParaView <https://www.paraview.org>`_ or
+`Ensight <https://www.ansys.com/products/platform/ansys-ensight>`_.
 
+The images here demonstrate MACSio_, 2D data written with the Silo_ plugin
 
 .. figure:: macsio_vis1.png
    :width: 60%
    :align: center
 
-   VisIt displaying MACSio_ produced data on 4 tasks and 2.5 parts per task with the Silo plugin
+   VisIt_ displaying MACSio_ produced data on 4 tasks and 2.5 parts per task with the Silo_ plugin.
+   From left to right, the visualizations display the parallel decomposition of the mesh into
+   blocks, a smoothly varying, node-centered variable on the mesh, a high noise node-centered variable
+   and a low-noise node-centered variable.
 
 .. figure:: macsio_vis2.png
    :width: 60%
    :align: center
 
-   VisIt displaying MACSio_ produced data on 2048 tasks and 2.5 parts per task with the Silo plugin
+   VisIt_ displaying MACSio_ produced data on 2048 tasks and 2.5 parts per task with the Silo_ plugin
+   The left image shows the parallel decomposition of the mesh. The right image shows a smoothly
+   varying node-centered variable. In this example, there were 2048 tasks and 5120 mesh parts.

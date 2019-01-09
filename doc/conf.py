@@ -277,7 +277,11 @@ latex_elements = {
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
+# short-cut links for common/important cases
 rst_epilog = """
 .. _MACSio: https://computation.llnl.gov/projects/co-design/macsio 
 .. _MIF: https://www.hdfgroup.org/2017/03/mif-parallel-io-with-hdf5
+.. _VisIt: https://visit.llnl.gov
+.. _Silo: https://silo.llnl.gov
+.. _HDF5: https://www.hdfgroup.org/downloads/hdf5 
 """

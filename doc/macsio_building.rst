@@ -81,4 +81,5 @@ behavior. However, its conceivable that some C++'isms have crept into the code c
 warnings or outright errors with some C compilers. If you encounter such a situation,
 please file an issue for it so we are aware of the issue and can fix it.
 
-Note that the list of available plugins is determined by
+Note that the list of available plugins is determined by which plugins are compiled and
+linked with MACSio_'s main. So, plugins are determined at link-time, not run-time.
