@@ -263,28 +263,41 @@ kept the file count constant. It is concievable that if you continued this study
 larger and larger scales, you may also want the MIF_ file count to vary somewhat as well.
 Here is an example of doing that.
 
+Example 
+"""""""
+
+.. include:: ../macsio/weak_scaling.sh
+   :code: shell
+
+Which when run, results in the following sequence of MACSio_ command-lines.
+
 .. code-block:: shell
 
-   # function to map task count to MIF file count
-   nfiles()
-   {
-       if [[ $1 -le 32 ]]; then
-           echo 32
-       elif [[ $1 -le 8192 ]]; then
-           echo 64
-       elif [[ $1 -le 65536 ]]; then
-           echo 128
-       else
-           echo 256
-       fi
-   }
+   mpirun -np 32 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 32
+   mpirun -np 64 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 64
+   mpirun -np 128 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 64
+   mpirun -np 256 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 64
+   mpirun -np 512 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 64
+   mpirun -np 1024 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 64
+   mpirun -np 2048 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 64
+   mpirun -np 4096 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 64
+   mpirun -np 8192 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 64
+   mpirun -np 16384 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 128
+   mpirun -np 32768 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 128
+   mpirun -np 65536 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 128
+   mpirun -np 131072 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 256
+   mpirun -np 262144 macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF 256
 
-   n=32
-   while [[ $n -le 262144 ]] ; do
-       nf=nfiles $n
-       mpirun -np $n macsio --interface hdf5 --avg_num_parts 8 --part_size 100K --parallel_file_mode MIF $nf
-       n=$(expr $n \* 2)
-   done
+Because the default mesh type is rectilinear (which involves very little in the way of I/O for the mesh itself),
+the default number of mesh variables is 20, for a *typical* plugin running the MIF parallel I/O mode,
+each task will emit 8*20 (there are 8 mesh parts per task), 100K writes for a given dump. The default number of
+dumps is 10, so this will be repeated 10 times. For a ``--parallel_file_mode MIF 32`` run, each dump will produce
+32 files for a total of 320 files produced for that *first* run. In the first run, because file count and
+task count are 1:1, each file will contain just 8 mesh parts. For the last run, there are 256 files per dump
+but 262144 tasks, each task having 8 mesh parts. So, each file would, in that case, contain 8192 mesh parts.
+
+Now, because the HDF5 plugin also supports the SIF parallel I/O mode, we could run the same sequence of tests
+in that mode by replacing ``MIF XX`` with ``SIF``.
 
 Strong Scaling Study Command-Line Example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -299,44 +312,30 @@ In the preceding *weak* scaling example, MACSio_ generated a *global* mesh of si
 as a *nominal* *global* mesh size, we can then use a given task count to determine part size
 and average part count to hit that target global size. We demonstrate this in the following code block...
 
+.. include:: ../macsio/strong_scaling.sh
+   :code: shell
+
+When this shell code is run, it results in the following sequence of MACSio_ command-lines. Note that we cap
+the total number of files at 1024. Depending on the particular system where this is run, this cap may be low
+or too high. The *best* number is the number of I/O *nodes* a given instance of MACSio_ can *see* when running.
+This number is not always easily known or obtained.
+
 .. code-block:: shell
 
-   # target total byte count
-   ttbc=6710886400
-
-   nparts_and_part_size()
-   {
-       # start by assming just one part per task
-       nparts=1
-
-       # nominal part size is total target size divided by
-       # number of tasks (arg $1 to function). Note that
-       # integer arithmetic here will cause some variation from
-       # target ttbc
-       psize=$(expr $ttbc / $1)
-
-       # if the part size is bigger than the 100K we used in the weak study,
-       # lets reduce it and then increase the number of parts
-       if [[ $psize -ge 102400 ]]; then
-           nparts=$(echo "$psize/102400" | bc -l)
-       fi
-
-       echo $nparts $psize
-   }
-
-   n=32
-   while [[ $n -le 262144 ]] ; do
-       nparts=$(nparts_and_part_size $n | cut -d' ' -f1)
-       psize=$(nparts_and_part_size $n | cut -d' ' -f2)
-       nf=$n
-       # allow file count to trak task count to 1024 tasks
-       # then keep it constant after that
-       if [[ $nf -ge 1024 ]]; then
-           nf=1024
-       fi
-       mpirun -np $n macsio --interface hdf5 --avg_num_parts $nparts --part_size $psize --parallel_file_mode MIF $nf
-       n=$(expr $n \* 2)
-   done
+   mpirun -np 32 ./macsio --interface hdf5 --avg_num_parts 2048 --part_size 102400 --parallel_file_mode MIF 32
+   mpirun -np 64 ./macsio --interface hdf5 --avg_num_parts 1024 --part_size 102400 --parallel_file_mode MIF 64
+   mpirun -np 128 ./macsio --interface hdf5 --avg_num_parts 512 --part_size 102400 --parallel_file_mode MIF 128
+   mpirun -np 256 ./macsio --interface hdf5 --avg_num_parts 256 --part_size 102400 --parallel_file_mode MIF 256
+   mpirun -np 512 ./macsio --interface hdf5 --avg_num_parts 128 --part_size 102400 --parallel_file_mode MIF 512
+   mpirun -np 1024 ./macsio --interface hdf5 --avg_num_parts 64 --part_size 102400 --parallel_file_mode MIF 1024
+   mpirun -np 2048 ./macsio --interface hdf5 --avg_num_parts 32 --part_size 102400 --parallel_file_mode MIF 1024
+   mpirun -np 4096 ./macsio --interface hdf5 --avg_num_parts 16 --part_size 102400 --parallel_file_mode MIF 1024
+   mpirun -np 8192 ./macsio --interface hdf5 --avg_num_parts 8 --part_size 102400 --parallel_file_mode MIF 1024
+   mpirun -np 16384 ./macsio --interface hdf5 --avg_num_parts 4 --part_size 102400 --parallel_file_mode MIF 1024
+   mpirun -np 32768 ./macsio --interface hdf5 --avg_num_parts 2 --part_size 102400 --parallel_file_mode MIF 1024
+   mpirun -np 65536 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 102400 --parallel_file_mode MIF 1024
+   mpirun -np 131072 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 51200 --parallel_file_mode MIF 1024
+   mpirun -np 262144 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 25600 --parallel_file_mode MIF 1024
 
 To perform a strong scaling study in SIF parallel I/O mode, just replace the trailing
 ``MIF $nf`` in the above MACSio_ command line above with ``SIF``.
