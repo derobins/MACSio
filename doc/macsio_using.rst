@@ -45,6 +45,10 @@ are passed to the plugin and not interpreted by MACSio_'s main.
 Summary of Key Command Line Arguments
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+MACSio_ has many command-line arguments and that number is only likely to grow with time.
+We discuss here, only those the most relevant to initially getting started running MACSio_
+tests.
+
 MACSio_ is different from I/O benchmarking tools because it constructs and marshals data
 as real data objects commonly used in scientific computing applications. All of its
 command-line arguments are designed in these terms and one has to understand how those
