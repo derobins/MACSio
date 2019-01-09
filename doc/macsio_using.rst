@@ -345,7 +345,7 @@ Assessing Performance Achieved by MACSio
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Performance data is captured by MACSio_ as :ref:`timers <macsio_timing>` and then dumped 
 to strings (see :any:`MACSIO_TIMING_DumpTimersToStrings` for specific format of dumped
-timer data strings) for output to a :ref:`log <macsio_loggng>` file upon exit.
+timer data strings) for output to a :ref:`log <macsio_logging>` file upon exit.
 
 The performance data gathered by MACSio_ is wholly dependent on the degree to which
 developers of MACSio_ or its plugins have instrumented MACSio_ with suitable timing
