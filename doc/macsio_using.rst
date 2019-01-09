@@ -82,12 +82,12 @@ in square brackets.
     Specify the parallel file mode. There are several choices.  Not all parallel
     modes are supported by all plugins. Use 'MIF' for Multiple Independent File (MIF_)
     mode and then also specify the number of files. Or, use 'MIFFPP' for MIF_
-    mode and one file per processor and where macsio uses known processor count.
+    mode and one file per task and where macsio uses known task count.
     Use 'MIFOPT' for MIF_ mode and let MACSio_ determine an *optimum* file count
     based on heuristics. Use 'SIF' for SIngle shared File mode. If you also give a
     file count for SIF mode, then MACSio_ will perform a sort of hybrid combination
     of MIF_ and SIF modes.  It will produce the specified number of files by grouping
-    ranks in the the same way MIF_ does, but I/O within each group will be to a single,
+    tasks in the the same way MIF_ does, but I/O within each group will be to a single,
     shared file using SIF mode and a subsetted communicator. When using SIF parallel
     mode, be sure you are running on a true parallel file system (e.g. GPFS or Lustre).
 
@@ -123,10 +123,10 @@ in square brackets.
 --avg_num_parts : ``--avg_num_parts %f [1]``
     The average number of mesh parts per task.
     Non-integral values are acceptable. For example, a value that is half-way
-    between two integers, K and K+1, means that half the ranks have K mesh
+    between two integers, K and K+1, means that half the task have K mesh
     parts and half have K+1 mesh parts, a typical scanrio for multi-physics
     applications. As another example, a value of 2.75 here would mean that 75%
-    of the ranks get 3 parts and 25% of the ranks get 2 parts. Note that the total
+    of the tasks get 3 parts and 25% of the tasks get 2 parts. Note that the total
     number of parts is this number multiplied by the task count. If the result of
     that product is non-integral, it will be rounded and a warning message will be
     generated.
@@ -185,7 +185,7 @@ in square brackets.
              random key/val hierarchies.
 
 --compute_work_intensity : ``--compute_work_intensity %d [0]``
-    Add some compute workload (e.g. give the processors something to do)
+    Add some compute workload (e.g. give the tasks something to do)
     between I/O dumps. There are three levels of 'compute' that can be performed
     as follows:
 
@@ -220,7 +220,7 @@ MACSio_ Command Line Examples
 
      mpirun -np 93 macsio --interface hdf5 --parallel_file_mode SIF 1
 
-* Default per-proc request size is 80,000 bytes (10K doubles). To use a different
+* Default per-task request size is 80,000 bytes (10K doubles). To use a different
   request size, use --part_size. For example, to run on 128 tasks, 8 files in MIF_
   mode where I/O request size is 10 megabytes, use
 
@@ -231,19 +231,24 @@ MACSio_ Command Line Examples
   Here, the ``M`` after the ``10`` means either decimal Megabytes (Mb) or binary
   Mibibytes (Mi) depending on setting for ``--units_prefix_system``. Default is binary.
 
-* To use H5Z-ZFP compression plugin, be sure to have the plugin compiled and available
+* To use H5Z-ZFP compression plugin (**note:** we're talking about an HDF5_ *plugin* here),
+  be sure to have the plugin compiled and available
   with the same compiler and version of HDF5_ you are using with MACSio_. Here, we 
   demonstrate a MACSio_ command line that runs on 4 tasks, does MIF_ parallel I/O mode
   to 2 files, on a two dimensional, rectilinear mesh with an average number of parts per
   task of 2.5 and a nominal I/O request size of 40,000 bytes. The args after ``--plugin-args``
   are to specify ZFP compression parameters to the HDF5_ plugin. In this case, we use
-  ZFP library in *rate* mode with a bit-rate of 4.
+  H5Z-ZFP compression plugin in *rate* mode with a bit-rate of 4.
 
   .. code-block:: shell
 
      env HDF5_PLUGIN_PATH=<path-to-plugin-dir> mpirun -np 4 ./macsio --interface hdf5 --parallel_file_mode MIF 2 --avg_num_parts 2.5 --part_size 40000 --part_dim 2 --part_type rectilinear --num_dumps 2 --plugin_args --compression zfp rate=4
 
   where ``path-to-plugin-dir`` is the path to the directory containing ``libh5zzfp.{a,so,dylib}``
+
+.. only:: internals
+
+   .. note:: We should support any arbitrary HDF5_ plugin here by allowing for id=%d and cdvals="%d %d ..."
 
 Weak Scaling Study Command-Line Example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -322,7 +327,8 @@ and average part count to hit that target global size. We demonstrate this in th
 When this shell code is run, it results in the following sequence of MACSio_ command-lines. Note that we cap
 the total number of files at 1024. Depending on the particular system where this is run, this cap may be low
 or too high. The *best* number is the number of I/O *nodes* a given instance of MACSio_ can *see* when running.
-This number is not always easily known or obtained.
+Because this number typically varies with task count and where on the system the tasks are actually allocated,
+this number are is not always easily known or obtained.
 
 .. code-block:: shell
 
