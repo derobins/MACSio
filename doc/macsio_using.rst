@@ -1,10 +1,18 @@
 Using MACSio_
 -------------
 
+MACSio_ is probably very different from many other I/O benchmarking tools you
+may be familiar with. To orient yourself, it may be useful to read the first
+sections of the original :download:`design document <macsio_design.pdf>`.
+
+In particular, in *MACSio_ speak*, when we talk about I/O requests, request
+sizes, frequencies, etc., we speak about them in terms of the operations
+of a *real* application performing *dumps* of its *mesh* and *field* data.
+
 By default, MACSio_'s command-line arguments are designed to maintain constant
 per-task I/O workload as task count is varied. This means MACSio_, by default,
 exhibits *weak scaling* behavior. This does not mean, however, that strong scaling
-scenarios cannot be handled. It means only that extra work is involved in
+scenarios cannot also be handled. It means only that extra work is involved in
 constructing command-line arguments to ensure a *strong scaling* goal is achieved
 if that is desired.
 
@@ -328,7 +336,7 @@ When this shell code is run, it results in the following sequence of MACSio_ com
 the total number of files at 1024. Depending on the particular system where this is run, this cap may be low
 or too high. The *best* number is the number of I/O *nodes* a given instance of MACSio_ can *see* when running.
 Because this number typically varies with task count and where on the system the tasks are actually allocated,
-this number are is not always easily known or obtained.
+this number is not always easily known or obtained.
 
 .. code-block:: shell
 
@@ -349,6 +357,32 @@ this number are is not always easily known or obtained.
 
 To perform a strong scaling study in SIF parallel I/O mode, just replace the trailing
 ``MIF $nf`` in the above MACSio_ command line above with ``SIF``.
+
+This strong scaling scenario maintains constant part size (up to the last two iterations) and just
+varies the part count. Instead, we may want to do a strong scaling scenario where we maintain just
+a single part per task and vary that single part's size. This is demonstrated with following code...
+
+.. include:: ../macsio/strong_scaling_single_part.sh
+   :code: shell
+
+which prodcues the following sequence of MACSio_ command-lines...
+
+.. code-block:: shell
+
+   mpirun -np 32 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 209715200 --parallel_file_mode MIF 32
+   mpirun -np 64 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 104857600 --parallel_file_mode MIF 64
+   mpirun -np 128 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 52428800 --parallel_file_mode MIF 128
+   mpirun -np 256 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 26214400 --parallel_file_mode MIF 256
+   mpirun -np 512 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 13107200 --parallel_file_mode MIF 512
+   mpirun -np 1024 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 6553600 --parallel_file_mode MIF 1024
+   mpirun -np 2048 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 3276800 --parallel_file_mode MIF 1024
+   mpirun -np 4096 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 1638400 --parallel_file_mode MIF 1024
+   mpirun -np 8192 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 819200 --parallel_file_mode MIF 1024
+   mpirun -np 16384 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 409600 --parallel_file_mode MIF 1024
+   mpirun -np 32768 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 204800 --parallel_file_mode MIF 1024
+   mpirun -np 65536 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 102400 --parallel_file_mode MIF 1024
+   mpirun -np 131072 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 51200 --parallel_file_mode MIF 1024
+   mpirun -np 262144 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 25600 --parallel_file_mode MIF 1024
 
 Assessing Performance Achieved by MACSio
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
