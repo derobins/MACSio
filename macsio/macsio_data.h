@@ -151,7 +151,7 @@ Creates the (default) PRNGs described here. Applications are free
 to create others as needed.
 */
 extern void
-MACSIO_DATA_InitializePRNGs(
+MACSIO_DATA_InitializeDefaultPRNGs(
     unsigned mpi_rank, /**< unsigned representation of MPI rank of calling processor */
     unsigned curr_time /**< unsigned but otherwise arbitrary representation of current time but
                             which is equal on all ranks yet guaranteed to vary from run to run. */ 
@@ -162,7 +162,7 @@ MACSIO_DATA_InitializePRNGs(
 Should be called near the termination of application.
 */
 extern void
-MACSIO_DATA_FinalizePRNGs(void);
+MACSIO_DATA_FinalizeDefaultPRNGs(void);
 
 /*!@}*/
 

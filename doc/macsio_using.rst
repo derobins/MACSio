@@ -333,7 +333,7 @@ and average part count to hit that target global size. We demonstrate this in th
    :code: shell
 
 When this shell code is run, it results in the following sequence of MACSio_ command-lines. Note that we cap
-the total number of files at 1024. Depending on the particular system where this is run, this cap may be low
+the total number of files at 1024. Depending on the particular system where this is run, this cap may be too low
 or too high. The *best* number is the number of I/O *nodes* a given instance of MACSio_ can *see* when running.
 Because this number typically varies with task count and where on the system the tasks are actually allocated,
 this number is not always easily known or obtained.
@@ -358,9 +358,10 @@ this number is not always easily known or obtained.
 To perform a strong scaling study in SIF parallel I/O mode, just replace the trailing
 ``MIF $nf`` in the above MACSio_ command line above with ``SIF``.
 
-This strong scaling scenario maintains constant part size (up to the last two iterations) and just
-varies the part count. Instead, we may want to do a strong scaling scenario where we maintain just
-a single part per task and vary that single part's size. This is demonstrated with following code...
+This strong scaling scenario maintains constant part size (up to the last three iterations) and just
+varies the part count to hit the target global size. Instead, we may want to do a strong scaling
+scenario where we maintain just a single part per task and vary that single part's size to hit the
+target global size. This is demonstrated with following code...
 
 .. include:: ../macsio/strong_scaling_single_part.sh
    :code: shell
@@ -384,10 +385,40 @@ which prodcues the following sequence of MACSio_ command-lines...
    mpirun -np 131072 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 51200 --parallel_file_mode MIF 1024
    mpirun -np 262144 ./macsio --interface hdf5 --avg_num_parts 1 --part_size 25600 --parallel_file_mode MIF 1024
 
+The difference in these two strong scaling scenarious is that the first one will suffer from per-part
+overheads. Each task will have per-part memory overheads and per-part I/O request overheads which the
+second scenario does not suffer.
+
 Assessing Performance Achieved by MACSio
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Performance data is captured by MACSio_ as :ref:`timers <macsio_timing>` and then dumped 
-to strings (see :any:`MACSIO_TIMING_DumpTimersToStrings` for specific format of dumped
+
+On the one hand, MACSio_ tries to boil all the performance data down to a single, scalar
+metric; the average time to complete a *dump* or the average *bandwidth* for completing
+a dump. This information is captured in task 0's section (header) MACSio_'s main log file,
+``macsio-log.log``.
+
+.. only:: internals
+
+   .. note:: Change log file to use *task* instead of *processor*.
+
+An example is shown below for 10 dumps from a 4 task run.
+
+.. include:: ../macsio/macsio-log-example.log
+   :code: shell
+
+The key line in the file, for task 0, is the total bytes divided by the time between
+the last task to finish and the first task to start which looks similar to the line
+below...
+
+.. code-block:: shell
+
+   Info:"macsio_main.c":727:Total Bytes:  57.4580 Mi; Last finisher - First starter =   1.5012 secs; BW =  38.2758 Mi/sec:::
+
+Detailed Performance Data
+"""""""""""""""""""""""""
+
+Detailed performance data is captured by MACSio_ as :ref:`timers <macsio_timing>` and then
+dumped to strings (see :any:`MACSIO_TIMING_DumpTimersToStrings` for specific format of dumped
 timer data strings) for output to a :ref:`log <macsio_logging>` file upon exit.
 
 The performance data gathered by MACSio_ is wholly dependent on the degree to which

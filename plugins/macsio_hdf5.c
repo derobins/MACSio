@@ -726,7 +726,7 @@ CloseHDF5File(
     }
 
     /* Check for any open objects in this file */
-    int noo = H5Fget_obj_count(fid, obj_flags);
+    noo = H5Fget_obj_count(fid, obj_flags);
     close_retval = H5Fclose(*((hid_t*) file));
     free(file);
 

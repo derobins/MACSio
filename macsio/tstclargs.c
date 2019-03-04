@@ -5,6 +5,9 @@
 #include <macsio_clargs.h>
 #include <macsio_log.h>
 
+#ifdef HAVE_MPI
+#include <mpi.h>
+#endif
 
 /* long help string */
 static char const *lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
@@ -169,7 +172,11 @@ int main(int argc, char **argv)
     char **argv2;
     MACSIO_CLARGS_ArgvFlags_t argFlags;
 
-    MACSIO_LOG_StdErr = MACSIO_LOG_LogInit(0, 0, 0, 0, 0);
+#ifdef HAVE_MPI
+    MPI_Init(&argc, &argv);
+#endif
+
+    MACSIO_LOG_StdErr = MACSIO_LOG_LogInit(MPI_COMM_WORLD, 0, 0, 0, 0);
 
     /* two iterations; 0) for memory routing, 1) for json routing */
     for (j = 0; j < 2; j++)

@@ -653,7 +653,7 @@ main_read(int argi, int argc, char **argv, json_object *main_obj)
     return (0);
 }
 
-static void InitializePRNGs(void)
+static void InitializeDefaultPRNGs(void)
 {
     double currtime = MT_Time();
     unsigned ucurrtim = ((unsigned *)&currtime)[0] ^ ((unsigned *)&currtime)[1];
@@ -664,10 +664,10 @@ static void InitializePRNGs(void)
 #endif
 
     /* Initialize the PRNGs */
-    MACSIO_DATA_InitializePRNGs((unsigned) MACSIO_MAIN_Rank, ucurrtim);
+    MACSIO_DATA_InitializeDefaultPRNGs((unsigned) MACSIO_MAIN_Rank, ucurrtim);
 }
 
-static void FinalizePRNGs()
+static void FinalizeDefaultPRNGs()
 {
 #ifdef HAVE_MPI
     /* Lets confirm the rank-invariant PRNGs agree and issue a message if not */
@@ -681,7 +681,7 @@ static void FinalizePRNGs()
     }
 #endif
 
-    MACSIO_DATA_FinalizePRNGs();
+    MACSIO_DATA_FinalizeDefaultPRNGs();
 }
 
 int
@@ -720,7 +720,7 @@ main(int argc, char *argv[])
     main_grp = MACSIO_TIMING_GroupMask("MACSIO main()");
     main_tid = MT_StartTimer("main", main_grp, MACSIO_TIMING_ITER_AUTO);
 
-    InitializePRNGs();
+    InitializeDefaultPRNGs();
 
     /* Process the command line and put the results in the problem */
     clargs_obj = ProcessCommandLine(argc, argv, &argi);
@@ -763,7 +763,7 @@ main(int argc, char *argv[])
 
     MACSIO_TIMING_ClearTimers(MACSIO_TIMING_ALL_GROUPS);
 
-    FinalizePRNGs();
+    FinalizeDefaultPRNGs();
 
 ////#warning ATEXIT THESE
     if (json_object_put(main_obj) != 1)
