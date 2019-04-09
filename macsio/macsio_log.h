@@ -155,7 +155,7 @@ typedef enum _MACSIO_LOG_MsgSeverity_t
     MACSIO_LOG_MsgDbg3,  /**< Debug level 3: For fine grained debugging messages (most likely effects performance) */
     MACSIO_LOG_MsgInfo,  /**< Informational messages */
     MACSIO_LOG_MsgWarn,  /**< Warnings of minor problems that can be recovered from without undue effects */
-    MACSIO_LOG_MsgErr,   /**< Error conditions that result in a change in expected/anticipated behavior */
+    MACSIO_LOG_MsgErr,   /**< Error conditions that result in unexpected behavior */
     MACSIO_LOG_MsgDie    /**< Unrecoverable errors */
 } MACSIO_LOG_MsgSeverity_t;
 
