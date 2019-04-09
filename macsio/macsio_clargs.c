@@ -182,7 +182,7 @@ MACSIO_CLARGS_ProcessCmdline(
             else
                terminalWidth = 80; /* best we can do is assume */
          }
-         snprintf(cmd, sizeof(cmd), "fmt -p -w %d", terminalWidth);
+         snprintf(cmd, sizeof(cmd), "fmt -w %d", terminalWidth);
          outFILE = popen(cmd, "w");
          if (!outFILE)
 	     outFILE = (isatty(2) ? stderr : stdout);
