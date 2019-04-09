@@ -142,7 +142,7 @@ MACSIO_CLARGS_ProcessCmdline(
    va_list ap;
    json_object *ret_json_obj = 0;
    int depth;
-   MACSIO_LOG_MsgSeverity_t msgSeverity = MACSIO_LOG_MsgDie;
+   MACSIO_LOG_MsgSeverity_t msgSeverity = flags.error_mode?MACSIO_LOG_MsgDie:MACSIO_LOG_MsgErr;
 
 #ifdef HAVE_MPI
    {  int result;
