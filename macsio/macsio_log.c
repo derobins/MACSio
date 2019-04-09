@@ -296,7 +296,7 @@ MACSIO_LOG_LogMsgWithDetails(
     MACSIO_LOG_LogMsg(log, "%s:%s:%s:%s:%s", _sig, _msg, _err, _mpistr, _mpicls);
     if (sevVal == MACSIO_LOG_MsgDie)
 #ifdef HAVE_MPI
-        MPI_Abort(MPI_COMM_WORLD, 0);
+        MPI_Abort(MPI_COMM_WORLD, mpiErrno==MPI_SUCCESS?sysErrno:mpiErrno);
 #else
         exit(sysErrno);
 #endif

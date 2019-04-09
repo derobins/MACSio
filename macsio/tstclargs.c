@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <unistd.h>
 
 #include <json-cwx/json.h>
 
@@ -101,14 +102,29 @@ static int ParseCommandLine(int argc, char **argv,
     int dummyd;
     int argi, argn;
     json_object *jargs;
-
     argi = 1;
+#ifndef HAVE_MPI
+    /* Run error/die cases in separate executable and just gather return code */
+    pid_t newpid = 0;
+
+    if (argFlags.error_mode = MACSIO_CLARGS_ERROR)
+        newpid = fork();
+
+    if (newpid != 0)
+    {
+        int status;
+        wait(&status);
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != EINVAL)
+            abort();
+        return 0;
+    }
+#endif
 
     if (mode == MACSIO_CLARGS_TOMEM)
     {
         PCL(0, &mybool, &myint, &mydouble, &pmystring, &multi1, &multi2, &dummyd, &dummyf, &argn, COMMA, 2);
 
-        if (pass == HELP) return 0;
+        if (pass == HELP || pass == WARN || pass == ERROR) return 0;
 
         if (pass == CHECKVAL)
         {
@@ -163,6 +179,7 @@ static int ParseCommandLine(int argc, char **argv,
             CHECK_VAL(--bool-example, JsonGetInt(jargs, "argi") == 4);
         }
     }
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -204,6 +221,7 @@ int main(int argc, char **argv)
         free(argv2);
 
         /* Test error */
+#ifndef HAVE_MPI
         argFlags.error_mode = MACSIO_CLARGS_ERROR;
         argc2 = 2;
         argv2 = (char **) malloc(argc2 * sizeof(char*));
@@ -212,6 +230,7 @@ int main(int argc, char **argv)
         ParseCommandLine(argc2, argv2, argFlags, argFlags.route_mode, ERROR);
         for (i = 0; i < argc2; free(argv2[i]), i++);
         free(argv2);
+#endif
 
         /* Test bool assignment */
         argc2 = 2;

@@ -592,6 +592,10 @@ MACSIO_CLARGS_ProcessCmdline(
       {
 	 char *p = strrchr(argv[0], '/');
 	 p = p ? p+1 : argv[0];
+         errno = EINVAL; /* if dieing, ensure executable returns useful error code */
+#ifdef HAVE_MPI
+         mpi_errno = MPI_SUCCESS;
+#endif
 	 if (rank == 0)
              MACSIO_LOG_MSGLV(MACSIO_LOG_StdErr, msgSeverity,
                  ("%s: unknown argument %s. Type %s --help for help",p,argv[i],p));
