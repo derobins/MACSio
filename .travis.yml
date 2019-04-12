@@ -2,7 +2,11 @@ language: C
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install cmake
+  - sudo apt-get install -y mpich2
+  - sudo apt-get install -y cmake
+  - sudo apt-get install -y hdf5
+  - which h5ls
+  - which mpicc
   - pwd
   - ls
   - pushd /tmp
@@ -36,7 +40,7 @@ install: true
 script:
   - mkdir build
   - pushd build
-  - cmake -DWITH_JSON-CWX_PREFIX=/tmp/json-cwx-0.12/json-cwx/my_install -DENABLE_HDF5_PLUGIN=ON -DWITH_HDF5_PREFIX=/tmp/hdf5-1.8.14/my_install -DENABLE_PBD_PLUGIN=ON -DENABLE_SILO_PLUGIN=ON -DWITH_SILO_PREFIX=/tmp/silo-4.10.2/my_install ../.
+  - cmake -DCMAKE_C_COMPILER:PATH=`which mpicc` -DCMAKE_CXX_COMPILER:PATH=`which mpicxx` -DWITH_JSON-CWX_PREFIX=/tmp/json-cwx-0.12/json-cwx/my_install -DENABLE_HDF5_PLUGIN=ON -DWITH_HDF5_PREFIX=/tmp/hdf5-1.8.14/my_install -DENABLE_PBD_PLUGIN=ON -DENABLE_SILO_PLUGIN=ON -DWITH_SILO_PREFIX=/tmp/silo-4.10.2/my_install ../.
   - make CFLAGS="-O0 -fPIC --coverage" LDFLAGS="--coverage -lm"
   - make check
   - pushd macsio; gcov -a tstlog tsttiming tstprng tstclargs macsio; popd
