@@ -211,6 +211,7 @@ int main(int argc, char **argv)
         for (i = 0; i < argc2; free(argv2[i]), i++);
         free(argv2);
 
+#ifndef HAVE_MPI
         /* Test warning */
         argc2 = 2;
         argv2 = (char **) malloc(argc2 * sizeof(char*));
@@ -221,7 +222,6 @@ int main(int argc, char **argv)
         free(argv2);
 
         /* Test error */
-#ifndef HAVE_MPI
         argFlags.error_mode = MACSIO_CLARGS_ERROR;
         argc2 = 2;
         argv2 = (char **) malloc(argc2 * sizeof(char*));
