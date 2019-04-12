@@ -156,7 +156,9 @@ static void handle_list_request_and_exit()
 
 static json_object *ProcessCommandLine(int argc, char *argv[], int *plugin_argi)
 {
-    MACSIO_CLARGS_ArgvFlags_t const argFlags = {MACSIO_CLARGS_WARN, MACSIO_CLARGS_TOJSON};
+    MACSIO_CLARGS_ArgvFlags_t const argFlags = {MACSIO_CLARGS_ERROR,
+                                                MACSIO_CLARGS_TOJSON,
+                                                MACSIO_CLARGS_ASSIGN_ON};
     json_object *mainJargs = 0;
     int plugin_args_start = -1;
     int cl_result;
@@ -362,12 +364,15 @@ static json_object *ProcessCommandLine(int argc, char *argv[], int *plugin_argi)
     if (!strcmp(json_object_path_get_string(mainJargs, "interface"), "list"))
         handle_list_request_and_exit();
 
+#if 0
     /* sanity check some values */
     if (!strcmp(json_object_path_get_string(mainJargs, "interface"), ""))
         MACSIO_LOG_MSG(Die, ("no io-interface specified"));
+#endif
 
     if (plugin_argi)
         *plugin_argi = plugin_args_start>-1?plugin_args_start+1:argc;
+
 
     return mainJargs;
 }
@@ -480,9 +485,9 @@ main_write(int argi, int argc, char **argv, json_object *main_obj)
    
     int doWork = 0;
     if (work_dt > 0){
-    doWork=1;
+        doWork=1;
     } else {
-    work_dt = 1;
+        work_dt = 1;
     }
 
     dt = work_dt;
@@ -731,6 +736,10 @@ main(int argc, char *argv[])
 #endif
     errno = 0;
 
+    /* We need to init the error log pretty early in main for other
+       components to have a log to write high priority error messages */
+    MACSIO_LOG_StdErr = MACSIO_LOG_LogInit(MACSIO_MAIN_Comm, 0, 0, 0, 0);
+
     /* Start Timing Package */
     main_grp = MACSIO_TIMING_GroupMask("MACSIO main()");
     main_tid = MT_StartTimer("main", main_grp, MACSIO_TIMING_ITER_AUTO);
@@ -744,7 +753,6 @@ main(int argc, char *argv[])
     strncpy(MACSIO_UTILS_UnitsPrefixSystem, JsonGetStr(clargs_obj, "units_prefix_system"),
         sizeof(MACSIO_UTILS_UnitsPrefixSystem));
 
-    MACSIO_LOG_StdErr = MACSIO_LOG_LogInit(MACSIO_MAIN_Comm, 0, 0, 0, 0);
     MACSIO_LOG_MainLog = MACSIO_LOG_LogInit(MACSIO_MAIN_Comm,
         JsonGetStr(clargs_obj, "log_file_name"),
         JsonGetInt(clargs_obj, "log_line_length"),
