@@ -27,7 +27,7 @@ before_install:
   - wget https://portal.nersc.gov/project/visit/releases/3.0.0b/third_party/silo-4.10.2.tar.gz
   - tar -xzf silo-4.10.2.tar.gz
   - pushd silo-4.10.2
-  - ./configure --disable-fortran --enable-install-lite-headers --prefix=`pwd`/my_install --with-hdf5=/tmp/hdf5-1.8.14/my_install/include,/tmp/hdf5-1.8.14/my_install/lib
+  - ./configure --disable-hzip --disable-fpzip --disable-fortran --enable-install-lite-headers --prefix=`pwd`/my_install --with-hdf5=/tmp/hdf5-1.8.14/my_install/include,/tmp/hdf5-1.8.14/my_install/lib
   - make -j4 install 1>/dev/null 2>&1
   - popd
 
