@@ -22,8 +22,8 @@ before_install:
   - make -j4 install 1>/dev/null 2>&1
   - popd
 
-  - wget https://wci.llnl.gov/content/assets/docs/simulation/computer-codes/silo/silo-4.10.2/silo-4.10.2-bsd.tar.gz
-  - tar -xzf silo-4.10.2-bsd.tar.gz
+  - wget https://portal.nersc.gov/project/visit/releases/3.0.0b/third_party/silo-4.10.2.tar.gz
+  - tar -xzf silo-4.10.2.tar.gz
   - pushd silo-4.10.2
   - ./configure --prefix=`pwd`/my_install --with-hdf5=/tmp/hdf5-1.8.14/my_install/include,/tmp/hdf5-1.8.14/my_install/lib
   - make -j4 install 1>/dev/null 2>&1
