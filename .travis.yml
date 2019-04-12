@@ -1,0 +1,45 @@
+language: C
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get cmake
+  - pwd
+  - ls
+  - pushd /tmp
+
+  - wget https://github.com/LLNL/json-cwx/archive/0.12.tar.gz
+  - tar -xzf 0.12.tar.gz
+  - pushd json-cwx-0.12
+  - ./configure --prefix=`pwd`/my_install
+  - make -j4 install 1>/dev/null 2>&1
+  - popd
+
+  - wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.14/src/hdf5-1.8.14.tar.gz
+  - tar -xzf hdf5-1.8.14.tar.gz
+  - pushd hdf5-1.8.14
+  - ./configure --prefix=`pwd`/my_install --enable-production
+  - make -j4 install 1>/dev/null 2>&1
+  - popd
+
+  - wget https://wci.llnl.gov/content/assets/docs/simulation/computer-codes/silo/silo-4.10.2/silo-4.10.2-bsd.tar.gz
+  - tar -xzf silo-4.10.2-bsd.tar.gz
+  - pushd silo-4.10.2
+  - ./configure --prefix=`pwd`/my_install --with-hdf5=/tmp/hdf5-1.8.14/my_install/include,/tmp/hdf5-1.8.14/my_install/lib
+  - make -j4 install 1>/dev/null 2>&1
+  - popd
+
+  - popd
+
+install: true
+
+script:
+  - mkdir build
+  - pushd build
+  - cmake -DWITH_JSON-CWX_PREFIX=/tmp/json-cwx-0.12/my_install -DENABLE_HDF5_PLUGIN=ON -DWITH_HDF5_PREFIX=/tmp/hdf5-1.8.14/my_install -DENABLE_PBD_PLUGIN=ON -DENABLE_SILO_PLUGIN=ON -DWITH_SILO_PREFIX=/tmp/silo-4.10.2/my_install ../.
+  - make CFLAGS="-O0 -fPIC --coverage" LDFLAGS="--coverage -lm"
+  - make check
+  - pushd macsio; gcov -a tstlog tsttiming tstprng tstclargs macsio; popd
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
