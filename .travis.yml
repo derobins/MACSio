@@ -39,8 +39,9 @@ script:
   - mkdir build
   - pushd build
   - cmake -DCMAKE_C_COMPILER:PATH=`which mpicc` -DCMAKE_CXX_COMPILER:PATH=`which mpicxx` -DWITH_JSON-CWX_PREFIX=/tmp/json-cwx-0.12/json-cwx/my_install -DENABLE_HDF5_PLUGIN=ON -DWITH_HDF5_PREFIX=/tmp/hdf5-1.8.14/my_install -DENABLE_PDB_PLUGIN=ON -DENABLE_SILO_PLUGIN=ON -DWITH_SILO_PREFIX=/tmp/silo-4.10.2/my_install ../.
-  - make VERBOSE=1 CFLAGS="-O0 -fPIC --coverage" LDFLAGS="--coverage -lm"
+  - make VERBOSE=1 CXXFLAGS="-O0 -fPIC --coverage" CFLAGS="-O0 -fPIC --coverage" LDFLAGS="--coverage -lm"
   - make test ARGS='-I 1,3,1,5,5,1'
+  - ls -Rl
   - pushd macsio; gcov -a tstlog tsttiming tstprng macsio; popd
 
 after_success:
