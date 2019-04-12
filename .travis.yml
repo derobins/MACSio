@@ -2,7 +2,6 @@ language: C
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get cmake
   - pwd
   - ls
   - pushd /tmp
