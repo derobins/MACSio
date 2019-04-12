@@ -10,7 +10,7 @@ before_install:
   - wget https://github.com/LLNL/json-cwx/archive/0.12.tar.gz
   - tar -xzf 0.12.tar.gz
   - pushd json-cwx-0.12/json-cwx
-  - autoreconf -vf
+  - sh autogen.sh
   - ./configure --prefix=`pwd`/my_install
   - make -j4 install 1>/dev/null 2>&1
   - popd
