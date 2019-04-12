@@ -4,8 +4,6 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y mpich2
   - sudo apt-get install -y cmake
-  - sudo apt-get install -y hdf5
-  - which h5ls
   - which mpicc
   - pwd
   - ls
