@@ -107,7 +107,7 @@ static int ParseCommandLine(int argc, char **argv,
     /* Run error/die cases in separate executable and just gather return code */
     pid_t newpid = 0;
 
-    if (argFlags.error_mode = MACSIO_CLARGS_ERROR)
+    if (pass == ERROR)
         newpid = fork();
 
     if (newpid != 0)
@@ -216,7 +216,6 @@ int main(int argc, char **argv)
         for (i = 0; i < argc2; free(argv2[i]), i++);
         free(argv2);
 
-#ifndef HAVE_MPI
         /* Test warning */
         argc2 = 2;
         argv2 = (char **) malloc(argc2 * sizeof(char*));
@@ -226,6 +225,7 @@ int main(int argc, char **argv)
         for (i = 0; i < argc2; free(argv2[i]), i++);
         free(argv2);
 
+#ifndef HAVE_MPI
         /* Test error */
         argFlags.error_mode = MACSIO_CLARGS_ERROR;
         argc2 = 2;
