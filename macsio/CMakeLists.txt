@@ -50,7 +50,10 @@ ADD_TEST(NAME tstlog COMMAND ${TEST_RUN} ./tstlog)
 ADD_TEST(NAME tsttiming COMMAND ${TEST_RUN} ./tsttiming)
 ADD_TEST(NAME tstprng COMMAND ${TEST_RUN} ./tstprng)
 ADD_TEST(NAME tstclargs COMMAND ${TEST_RUN} ./tstclargs)
-ADD_TEST(NAME simple COMMAND ${TEST_RUN} ./macsio)
+ADD_TEST(NAME miftmpl COMMAND ${TEST_RUN} ./macsio)
+ADD_TEST(NAME silo COMMAND ${TEST_RUN} ./macsio --interface silo)
+ADD_TEST(NAME pdb COMMAND ${TEST_RUN} ./macsio --interface pdb)
+ADD_TEST(NAME hdf5 COMMAND ${TEST_RUN} ./macsio --interface hdf5)
 
 INSTALL(TARGETS macsio RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
 
