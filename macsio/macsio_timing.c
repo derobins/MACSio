@@ -198,9 +198,7 @@ typedef struct _timerInfo_t
 } timerInfo_t;
 
 static timerInfo_t timerHashTable[MACSIO_TIMING_HASH_TABLE_SIZE];
-#ifdef HAVE_MPI
 static timerInfo_t reducedTimerTable[MACSIO_TIMING_HASH_TABLE_SIZE];
-#endif
 
 #ifdef HAVE_CALIPER
 typedef struct _caliperAttributeInfo_t {

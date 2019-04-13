@@ -867,7 +867,9 @@ main_dump(
 //#warning SET ERROR MODE OF HDF5 LIBRARY
 
     /* Without this barrier, I get strange behavior with Silo's MACSIO_MIF interface */
+#ifdef HAVE_MPI
     mpi_errno = MPI_Barrier(MACSIO_MAIN_Comm);
+#endif
 
     /* process cl args */
     process_args(argi, argc, argv);

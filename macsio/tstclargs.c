@@ -188,12 +188,17 @@ int main(int argc, char **argv)
     int argc2;
     char **argv2;
     MACSIO_CLARGS_ArgvFlags_t argFlags;
+#ifdef HAVE_MPI
+    MPI_Comm comm = MPI_COMM_WORLD;
+#else
+    int comm = 0;
+#endif
 
 #ifdef HAVE_MPI
     MPI_Init(&argc, &argv);
 #endif
 
-    MACSIO_LOG_StdErr = MACSIO_LOG_LogInit(MPI_COMM_WORLD, 0, 0, 0, 0);
+    MACSIO_LOG_StdErr = MACSIO_LOG_LogInit(comm, 0, 0, 0, 0);
 
     /* two iterations; 0) for memory routing, 1) for json routing */
     for (j = 0; j < 2; j++)

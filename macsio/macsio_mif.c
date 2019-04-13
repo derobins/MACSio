@@ -49,6 +49,8 @@ typedef struct _MACSIO_MIF_baton_t
     MACSIO_MIF_ioFlags_t ioFlags; /**< Various flags controlling behavior. */
 #ifdef HAVE_MPI
     MPI_Comm mpiComm;           /**< The MPI communicator being used */
+#else
+    int mpiComm;                /**< Dummy MPI communicator */
 #endif
     int commSize;               /**< The size of the MPI comm */
     int rankInComm;             /**< Rank of this processor in the MPI comm */
@@ -89,7 +91,7 @@ MACSIO_MIF_Init(
 )
 {
     int numGroups = numFiles;
-    int commSize, rankInComm;
+    int commSize=1, rankInComm=0;
     int groupSize, numGroupsWithExtraProc, commSplit,
         groupRank, rankInGroup, procBeforeMe, procAfterMe;
     MACSIO_MIF_baton_t *ret = 0;
@@ -97,8 +99,10 @@ MACSIO_MIF_Init(
     procBeforeMe = -1;
     procAfterMe = -1;
 
+#ifdef HAVE_MPI
     MPI_Comm_size(mpiComm, &commSize);
     MPI_Comm_rank(mpiComm, &rankInComm);
+#endif
 
     groupSize              = commSize / numGroups;
     numGroupsWithExtraProc = commSize % numGroups;
@@ -169,24 +173,33 @@ MACSIO_MIF_WaitForBaton(
 {
     if (Bat->procBeforeMe != -1)
     {
+        int mpi_err;
+#ifdef HAVE_MPI
         MPI_Status mpi_stat;
         int baton;
-        int mpi_err = MPI_Recv(&baton, 1, MPI_INT, Bat->procBeforeMe,
-            Bat->mpiTag, Bat->mpiComm, &mpi_stat);
+        mpi_err = MPI_Recv(&baton, 1, MPI_INT, Bat->procBeforeMe,
+                           Bat->mpiTag, Bat->mpiComm, &mpi_stat);
         if (mpi_err == MPI_SUCCESS && baton != MACSIO_MIF_BATON_ERR)
+#else
+        if (1)
+#endif
         {
-#ifdef HAVE_SCR
-            char scr_filename[SCR_MAX_FILENAME];
             if (Bat->ioFlags.use_scr)
             {
+#ifdef HAVE_SCR
+                char scr_filename[SCR_MAX_FILENAME];
                 if (SCR_Route_file(fname, scr_filename) == SCR_SUCCESS)
                     return Bat->openCb(scr_filename, nsname, Bat->ioFlags, Bat->clientData);
                 else
                     return Bat->openCb(fname, nsname, Bat->ioFlags, Bat->clientData);
+#else
+                return Bat->openCb(fname, nsname, Bat->ioFlags, Bat->clientData);
+#endif
             }
             else
-#endif
+            {
                 return Bat->openCb(fname, nsname, Bat->ioFlags, Bat->clientData);
+            }
         }
         else
         {
@@ -199,31 +212,41 @@ MACSIO_MIF_WaitForBaton(
     {
         if (Bat->ioFlags.do_wr)
         {
-#ifdef HAVE_SCR
-            char scr_filename[SCR_MAX_FILENAME];
             if (Bat->ioFlags.use_scr)
             {
-                SCR_Route_file(fname, scr_filename);
-                return Bat->createCb(scr_filename, nsname, Bat->clientData);
+#ifdef HAVE_SCR
+                char scr_filename[SCR_MAX_FILENAME];
+                if (SCR_Route_file(fname, scr_filename) == SCR_SUCCESS)
+                    return Bat->createCb(scr_filename, nsname, Bat->clientData);
+                else
+                    return Bat->createCb(fname, nsname, Bat->clientData);
+#else
+                return Bat->createCb(fname, nsname, Bat->clientData);
+#endif
             }
             else
-#endif
+            {
                 return Bat->createCb(fname, nsname, Bat->clientData);
+            }
         }
         else
         {
-#ifdef HAVE_SCR
-            char scr_filename[SCR_MAX_FILENAME];
             if (Bat->ioFlags.use_scr)
             {
+#ifdef HAVE_SCR
+                char scr_filename[SCR_MAX_FILENAME];
                 if (SCR_Route_file(fname, scr_filename) == SCR_SUCCESS)
                     return Bat->openCb(scr_filename, nsname, Bat->ioFlags, Bat->clientData);
                 else
                     return Bat->openCb(fname, nsname, Bat->ioFlags, Bat->clientData);
+#else
+                return Bat->openCb(fname, nsname, Bat->ioFlags, Bat->clientData);
+#endif
             }
             else
-#endif
+            {
                 return Bat->openCb(fname, nsname, Bat->ioFlags, Bat->clientData);
+            }
         }
     }
 }
@@ -237,10 +260,15 @@ MACSIO_MIF_HandOffBaton(
     int retval = Bat->closeCb(file, Bat->clientData);
     if (Bat->procAfterMe != -1)
     {
+        int mpi_err;
+#ifdef HAVE_MPI
         int baton = Bat->mifErr;
-        int mpi_err = MPI_Ssend(&baton, 1, MPI_INT, Bat->procAfterMe,
-            Bat->mpiTag, Bat->mpiComm);
+        mpi_err = MPI_Ssend(&baton, 1, MPI_INT, Bat->procAfterMe,
+                            Bat->mpiTag, Bat->mpiComm);
         if (mpi_err != MPI_SUCCESS)
+#else
+        if (0)
+#endif
         {
             Bat->mifErr = MACSIO_MIF_BATON_ERR;
             Bat->mpiErr = mpi_err;
