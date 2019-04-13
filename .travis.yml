@@ -1,10 +1,12 @@
 language: C
 
 before_install:
-  - sudo apt-get -qq update
+  - sudo apt-get -qq update -y
   - sudo apt-get install -y mpich2
   - sudo apt-get install -y cmake
+  - sudo apt-get install libhdf5-serial-dev
   - which mpicc
+  - which h5ls
   - pwd
   - ls
   - pushd /tmp
