@@ -4,9 +4,11 @@ before_install:
   - sudo apt-get -qq update -y
   - sudo apt-get install -y mpich2
   - sudo apt-get install -y cmake
-  - sudo apt-get install -y libhdf5-dev
+  - sudo apt-get install -y libhdf5
   - which mpicc
   - which h5cc
+  - which h5ls
+  - dpkg -L libhdf5
   - pwd
   - ls
   - pushd /tmp
