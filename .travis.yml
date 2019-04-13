@@ -6,7 +6,7 @@ before_install:
   - sudo apt-get install -y cmake
   - sudo apt-get install -y libhdf5-dev
   - which mpicc
-  - which h5ls
+  - which h5cc
   - pwd
   - ls
   - pushd /tmp
