@@ -7,7 +7,7 @@ before_install:
   - sudo apt-get install -y libhdf5-dev
   - which mpicc
   - which h5cc
-  - dpkg -L libhdf5
+  - dpkg -L libhdf5-dev
   - pwd
   - ls
   - pushd /tmp
