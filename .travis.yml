@@ -35,6 +35,6 @@ script:
   - cmake -DCMAKE_C_COMPILER:PATH=`which mpicc` -DCMAKE_CXX_COMPILER:PATH=`which mpicxx` -DWITH_JSON-CWX_PREFIX=/tmp/json-cwx-0.12/json-cwx/my_install -DENABLE_HDF5_PLUGIN=ON -DENABLE_PDB_PLUGIN=ON -DENABLE_SILO_PLUGIN=ON -DWITH_SILO_PREFIX=/tmp/silo-4.10.2/my_install ../.
   - make VERBOSE=1
   - make check
-  - ctest -V
-  - ctest -V
-  - ctest -V
+  - ctest --force-new-ctest-process -VV --debug -E clargs
+  - ctest --force-new-ctest-process -VV --debug -E clargs
+  - ctest --force-new-ctest-process -VV --debug -E clargs
