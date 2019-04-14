@@ -6,6 +6,9 @@ before_install:
   - sudo apt-get install -y mpich2
   - sudo apt-get install -y cmake
   - sudo apt-get install -y libhdf5-dev
+  - gcc --version
+  - g++ --version
+  - gcov --version
   - which mpicc
   - which h5cc
   - dpkg -L libhdf5-dev
