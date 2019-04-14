@@ -20,17 +20,10 @@ before_install:
   - make -j4 install 1>/dev/null 2>&1
   - popd
 
-  - wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.14/src/hdf5-1.8.14.tar.gz
-  - tar -xzf hdf5-1.8.14.tar.gz
-  - pushd hdf5-1.8.14
-  - ./configure --prefix=`pwd`/my_install --enable-production
-  - make -j4 install 1>/dev/null 2>&1
-  - popd
-
   - wget https://portal.nersc.gov/project/visit/releases/3.0.0b/third_party/silo-4.10.2.tar.gz
   - tar -xzf silo-4.10.2.tar.gz
   - pushd silo-4.10.2
-  - ./configure --disable-hzip --disable-fpzip --disable-fortran --enable-install-lite-headers --prefix=`pwd`/my_install --with-hdf5=/tmp/hdf5-1.8.14/my_install/include,/tmp/hdf5-1.8.14/my_install/lib
+  - ./configure --disable-hzip --disable-fpzip --disable-fortran --enable-install-lite-headers --prefix=`pwd`/my_install DEFAULT_HDF5_LIBDIR=/foo/bar --with-hdf5=yes
   - make -j4 install 1>/dev/null 2>&1
   - popd
 
@@ -41,9 +34,9 @@ install: true
 script:
   - mkdir build
   - pushd build
-  - cmake -DMPI_C_COMPILE_FLAGS:STRING="-g -O0 -fPIC --coverage" -DMPI_CXX_COMPILE_FLAGS:STRING="-g -O0 -fPIC --coverage" -DCMAKE_C_FLAGS:STRING="-g -O0 -fPIC --coverage" -DCMAKE_CXX_FLAGS:STRING="-g -O0 -fPIC --coverage" -DMPI_CXX_LINK_FLAGS:STRING="--coverage -lm" -DCMAKE_EXE_LINKER_FLAGS:STRING="--coverage -lm" -DCMAKE_C_COMPILER:PATH=`which mpicc` -DCMAKE_CXX_COMPILER:PATH=`which mpicxx` -DWITH_JSON-CWX_PREFIX=/tmp/json-cwx-0.12/json-cwx/my_install -DENABLE_HDF5_PLUGIN=ON -DWITH_HDF5_PREFIX=/tmp/hdf5-1.8.14/my_install -DENABLE_PDB_PLUGIN=ON -DENABLE_SILO_PLUGIN=ON -DWITH_SILO_PREFIX=/tmp/silo-4.10.2/my_install ../.
+  - cmake -DMPI_C_COMPILE_FLAGS:STRING="-g -O0 -fPIC --coverage" -DMPI_CXX_COMPILE_FLAGS:STRING="-g -O0 -fPIC --coverage" -DCMAKE_C_FLAGS:STRING="-g -O0 -fPIC --coverage" -DCMAKE_CXX_FLAGS:STRING="-g -O0 -fPIC --coverage" -DMPI_CXX_LINK_FLAGS:STRING="--coverage -lm" -DCMAKE_EXE_LINKER_FLAGS:STRING="--coverage -lm" -DCMAKE_C_COMPILER:PATH=`which mpicc` -DCMAKE_CXX_COMPILER:PATH=`which mpicxx` -DWITH_JSON-CWX_PREFIX=/tmp/json-cwx-0.12/json-cwx/my_install -DENABLE_HDF5_PLUGIN=ON -DENABLE_PDB_PLUGIN=ON -DENABLE_SILO_PLUGIN=ON -DWITH_SILO_PREFIX=/tmp/silo-4.10.2/my_install ../.
   - make VERBOSE=1
-  - make test ARGS='-I 1,2,1,5,8,1'
+  - make test ARGS='-I 0,0,0,1,2,3,5,6,7,8'
   - pushd macsio; gcov `find . -name '*.gcno'`; popd;
 
 after_success:
