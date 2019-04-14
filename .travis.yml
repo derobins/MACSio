@@ -2,6 +2,7 @@ language: C
 
 before_install:
   - sudo apt-get -qq update -y
+  - sudo apt-get install -y gdb
   - sudo apt-get install -y mpich2
   - sudo apt-get install -y cmake
   - sudo apt-get install -y libhdf5-dev
@@ -31,18 +32,19 @@ before_install:
 
 install: true
 
+before_script:
+- ulimit -c unlimited -S
+
 script:
   - mkdir build
   - pushd build
   - cmake -DMPI_C_COMPILE_FLAGS:STRING="-g -O0 -fPIC --coverage" -DMPI_CXX_COMPILE_FLAGS:STRING="-g -O0 -fPIC --coverage" -DCMAKE_C_FLAGS:STRING="-g -O0 -fPIC --coverage" -DCMAKE_CXX_FLAGS:STRING="-g -O0 -fPIC --coverage" -DMPI_CXX_LINK_FLAGS:STRING="--coverage -lm" -DCMAKE_EXE_LINKER_FLAGS:STRING="--coverage -lm" -DCMAKE_C_COMPILER:PATH=`which mpicc` -DCMAKE_CXX_COMPILER:PATH=`which mpicxx` -DWITH_JSON-CWX_PREFIX=/tmp/json-cwx-0.12/json-cwx/my_install -DENABLE_HDF5_PLUGIN=ON -DENABLE_PDB_PLUGIN=ON -DENABLE_SILO_PLUGIN=ON -DWITH_SILO_PREFIX=/tmp/silo-4.10.2/my_install ../.
-  - make
-  - ctest -I 1,1,1
-  - ctest -I 2,2,1
-  - ctest -I 3,3,1
-  - ctest -I 4,4,1
-  - ctest -I 5,5,1
-  - ctest -I 6,6,1
+  - make check
   - pushd macsio; gcov `find . -name '*.gcno'`; popd;
+
+after_failure:
+  - COREFILE=$(find . -name "*core*" | head -n 1) # find core file
+  - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
