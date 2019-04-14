@@ -17,14 +17,14 @@ before_install:
   - tar -xzf 0.12.tar.gz
   - pushd json-cwx-0.12/json-cwx
   - sh autogen.sh
-  - ./configure --prefix=`pwd`/my_install
+  - ./configure CC=mpicc --prefix=`pwd`/my_install
   - make -j4 install 1>/dev/null 2>&1
   - popd
 
   - wget https://portal.nersc.gov/project/visit/releases/3.0.0b/third_party/silo-4.10.2.tar.gz
   - tar -xzf silo-4.10.2.tar.gz
   - pushd silo-4.10.2
-  - ./configure --disable-hzip --disable-fpzip --disable-fortran --enable-install-lite-headers --prefix=`pwd`/my_install DEFAULT_HDF5_LIBDIR=/tmp DEFAULT_HDF5_INCLUDE=/tmp --with-hdf5=yes
+  - ./configure CC=mpicc --disable-hzip --disable-fpzip --disable-fortran --enable-install-lite-headers --prefix=`pwd`/my_install DEFAULT_HDF5_LIBDIR=/tmp DEFAULT_HDF5_INCLUDE=/tmp --with-hdf5=yes
   - make -j4 install 1>/dev/null 2>&1
   - popd
 
